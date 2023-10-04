@@ -2,18 +2,58 @@
 #Tyler
 #Add your names here!!
 
-#10/2/2023 I added this line on my laptop in wing!
-#Testing pull on my desktop
-#another line
-#last line for real this time!!
+import random
+import winsound #winsound.PlaySound("ui_menu_button_beep_13", winsound.SND_FILENAME | winsound.SND_ASYNC)
+import graphics
+from Monster import *
+from Player import Player
+from InputHandler import *
+from graphics import *
+from time import sleep
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-#
+width = 720
+height = 720
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+gw = GraphWin("GAME", width, height) #This is the window where all the grapics are drawn.
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+inputHandler = InputHandler() #Object that recieves input from the window.
+
+player = Player(Point(width/2,height/2),inputHandler) #Player object that is controller by user.
+monster = Monster() #Monster object that chases the player around the map.
+
+mousePosTxt = Text(Point(600, 25), f"Mouse Pos: {0},{0}")
+mousePosTxt.setTextColor("cyan")
+
+runtimeTxt = Text(Point(400, 25), "")
+
+def main():
+    global gw
+    gw.setBackground("black")
+    gw.setInputHandler(inputHandler) #We pass in the input handler to the window so it can recieve input!
+
+    mousePosTxt.draw(gw)
+    runtimeTxt.setTextColor("red")
+    runtimeTxt.draw(gw)
+
+    monster.draw(gw)
+    player.draw(gw)
+
+    done = False
+    while not done: #This will run until 'done' is False.
+        fps = time.time()
+
+        monster.setTargetPos(player.getPos().x,player.getPos().y)
+        monster.update()
+        player.update()
+
+        tt = time.time() - fps
+        sleep((6/1000))
+        runTime = (tt*1000).__round__(2)
+
+        mousePosTxt.setText(f"Mouse Pos: {inputHandler.getMousePos()}")
+        runtimeTxt.setText(f"Run Time: {str(runTime)}ms")
+
+        if (gw.closed): #When the window is closed the gameloop finishes
+            done = True
+
+main() #Calling this starts the game loop.
