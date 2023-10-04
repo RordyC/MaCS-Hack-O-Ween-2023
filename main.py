@@ -3,6 +3,8 @@
 #Add your names here!!
 
 import random
+import time
+
 import winsound #winsound.PlaySound("ui_menu_button_beep_13", winsound.SND_FILENAME | winsound.SND_ASYNC)
 import graphics
 from Monster import *
@@ -14,7 +16,7 @@ from time import sleep
 width = 720
 height = 720
 
-gw = GraphWin("GAME", width, height) #This is the window where all the grapics are drawn.
+gw = GraphWin("GAME", width, height,autoflush=False) #This is the window where all the grapics are drawn.
 
 inputHandler = InputHandler() #Object that recieves input from the window.
 
@@ -46,12 +48,14 @@ def main():
         monster.update()
         player.update()
 
+
+        sleep((16/1000))
         tt = time.time() - fps
-        sleep((6/1000))
-        runTime = (tt*1000).__round__(2)
+        runTime = (1000/(1000*tt)).__round__(2)
 
         mousePosTxt.setText(f"Mouse Pos: {inputHandler.getMousePos()}")
         runtimeTxt.setText(f"Run Time: {str(runTime)}ms")
+        gw.update() #Calling this redraws everything on screen.
 
         if (gw.closed): #When the window is closed the gameloop finishes
             done = True
