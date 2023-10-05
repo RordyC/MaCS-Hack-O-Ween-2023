@@ -5,7 +5,7 @@
 import random
 import time
 
-import winsound #winsound.PlaySound("ui_menu_button_beep_13", winsound.SND_FILENAME | winsound.SND_ASYNC)
+#import winsound #winsound.PlaySound("ui_menu_button_beep_13", winsound.SND_FILENAME | winsound.SND_ASYNC)
 import graphics
 from Monster import *
 from Player import Player
@@ -42,16 +42,16 @@ def main():
 
     done = False
     while not done: #This will run until 'done' is False.
-        fps = time.time()
+        currentTime = time.time()
 
         monster.setTargetPos(player.getPos().x,player.getPos().y)
         monster.update()
         player.update()
 
 
-        sleep((16/1000))
-        tt = time.time() - fps
-        runTime = (1000/(1000*tt)).__round__(2)
+        sleep((60/1000))
+        endTime = time.time() - currentTime
+        runTime = (1/(endTime)).__round__(2)
 
         mousePosTxt.setText(f"Mouse Pos: {inputHandler.getMousePos()}")
         runtimeTxt.setText(f"Run Time: {str(runTime)}ms")
