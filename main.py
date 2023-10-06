@@ -27,15 +27,22 @@ mousePosTxt = Text(Point(600, 25), f"Mouse Pos: {0},{0}")
 mousePosTxt.setTextColor("cyan")
 
 runtimeTxt = Text(Point(400, 25), "")
+fpsTxt = Text(Point(400, 50), "")
+
+deltaT = -1.0
 
 def main():
     global gw
+    global deltaT
     gw.setBackground("black")
     gw.setInputHandler(inputHandler) #We pass in the input handler to the window so it can recieve input!
 
     mousePosTxt.draw(gw)
-    runtimeTxt.setTextColor("red")
+    fpsTxt.setTextColor("yellow")
+
+    runtimeTxt.setTextColor("cyan")
     runtimeTxt.draw(gw)
+    fpsTxt.draw(gw)
 
     monster.draw(gw)
     player.draw(gw)
@@ -45,16 +52,18 @@ def main():
         currentTime = time.time()
 
         monster.setTargetPos(player.getPos().x,player.getPos().y)
-        monster.update()
-        player.update()
+        monster.update(deltaT)
+        player.update(deltaT)
 
 
-        sleep((60/1000))
-        endTime = time.time() - currentTime
-        runTime = (1/(endTime)).__round__(2)
+        sleep((0.01/1000))
+        deltaT = time.time() - currentTime
+
+        runTime = (deltaT*1000).__round__(1)
 
         mousePosTxt.setText(f"Mouse Pos: {inputHandler.getMousePos()}")
         runtimeTxt.setText(f"Run Time: {str(runTime)}ms")
+        fpsTxt.setText(f"FPS: {str((1000/runTime).__round__())}")
         gw.update() #Calling this redraws everything on screen.
 
         if (gw.closed): #When the window is closed the gameloop finishes

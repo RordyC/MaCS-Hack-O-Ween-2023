@@ -2,7 +2,7 @@ from graphics import *
 from math import sqrt
 class Monster(object):
     def __init__(self):
-        self.__movementSpeed = 2.0
+        self.__movementSpeed = 200
 
         self.__currentTargetX = 0
         self.__currentTargetY = 0
@@ -18,7 +18,7 @@ class Monster(object):
         self.__currentTargetX = x
         self.__currentTargetY = y
 
-    def update(self):
+    def update(self,deltaT):
         self.dx = 0
         self.dy = 0
 
@@ -34,4 +34,4 @@ class Monster(object):
 
         self.__debugT.setText("Monster Dir: "+str(self.dx.__round__(2)) + ":" + str(self.dy.__round__(2)))
         if (self.dx > 0.1, self.dy > 0.1):
-            self.__img.move(self.dx * self.__movementSpeed, self.dy * self.__movementSpeed)
+            self.__img.move(self.dx * self.__movementSpeed * deltaT, self.dy * self.__movementSpeed * deltaT)

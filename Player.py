@@ -8,16 +8,16 @@ class Player(object):
         self.__circle.setFill("purple")
         self.__circle.setOutline("red")
 
-        self.__speed = 4.0   #How fast the player can run around.
+        self.__speed = 400.0   #How fast the player can run around.
         self.__vx = 0.0 #Player velocity on the X axis.
         self.__vy = 0.0#Player velocity on the Y axis.
 
     def draw(self, gw: GraphWin):
             self.__circle.draw(gw)
 
-    def update(self):
-        self.__vx= self.__inputHandler.getXAxis() * self.__speed
-        self.__vy = self.__inputHandler.getYAxis() *self.__speed
+    def update(self,deltaTime:float):
+        self.__vx= self.__inputHandler.getXAxis() * self.__speed * deltaTime
+        self.__vy = self.__inputHandler.getYAxis() * self.__speed * deltaTime
         self.__circle.move(self.__vx,self.__vy)
         pass
     def getPos(self):
