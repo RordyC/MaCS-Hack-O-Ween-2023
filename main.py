@@ -47,6 +47,14 @@ def main():
     monster.draw(gw)
     player.draw(gw)
 
+    cx = 0
+    cy = 0
+
+    sx = 57
+    sy = 57
+    sw = 57
+    sh = 57
+
     done = False
     while not done: #This will run until 'done' is False.
         currentTime = time.time()
@@ -55,18 +63,42 @@ def main():
         monster.update(deltaT)
         player.update(deltaT)
 
+        cx = player.getPos().x
+        cy =player.getPos().y
 
-        sleep((0.01/1000))
-        deltaT = time.time() - currentTime
+        sx = monster.getPos().x - 57/2
+        sy = monster.getPos().y - 57/2
+
+
+        monster.hit(circleRect(cx, cy, 25, sx, sy,57,57))
+
+
 
         runTime = (deltaT*1000).__round__(1)
-
         mousePosTxt.setText(f"Mouse Pos: {inputHandler.getMousePos()}")
         runtimeTxt.setText(f"Run Time: {str(runTime)}ms")
         fpsTxt.setText(f"FPS: {str((1000/runTime).__round__())}")
-        gw.update() #Calling this redraws everything on screen.
 
+        sleep((1/1000))   #Calling this redraws everything on screen.
+        gw.update()
+
+        deltaT = time.time() - currentTime
         if (gw.closed): #When the window is closed the gameloop finishes
-            done = True
+            done = True 
 
+def circleRect(cx,cy,r,rx,ry,rw,rh):
+    testX = cx
+    testY = cy
+
+    if (cx < rx): testX = rx
+    elif (cx > (rx +rw)): testX = rx+rw
+
+    if (cy < ry): testY = ry
+    elif (cy>(ry+rh)): testY = ry + rh
+
+    distX = cx-testX
+    distY = cy-testY
+    distance = sqrt((distX*distX) + (distY*distY))
+
+    return (distance <= r)
 main() #Calling this starts the game loop.
