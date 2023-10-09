@@ -2,14 +2,14 @@ from graphics import *
 from math import sqrt
 class Monster():
     def __init__(self):
-        self.__movementSpeed = 50
+        self.__movementSpeed = 25
 
         self.__currentTargetX = 0
         self.__currentTargetY = 0
-        self.__img = Image(Point(0, 0), "head.png")
+        self.__img = Image(Point(25, 25), "head.png")
         self.__gw = None
         self.__angry = False
-        self.__altImg = Image(Point(0, 0), "angry_head.png")
+        self.__altImg = Image(Point(25, 25), "angry_head.png")
         self.__width = self.__img.getWidth()
         self.__debugT = Text(Point(200, 25), "Centered Text")
         self.__debugT.setTextColor("white")
