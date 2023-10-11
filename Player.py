@@ -1,14 +1,14 @@
 from graphics import *
 from math import sqrt
 from InputHandler import *
-class Player(object):
+class Player():
     def __init__(self, playerStart:Point,inputHandler:InputHandler):
         self.__inputHandler = inputHandler #Using this we can get direction the player wants to move!
-        self.__circle = Circle(playerStart, 25)
-        self.__circle.setFill("purple")
-        self.__circle.setOutline("red")
+        self.__circle = Circle(playerStart, 16)
+        self.__circle.setFill("orange")
+        self.__circle.setOutline("brown")
 
-        self.__speed = 4000.0   #How fast the player can run around.
+        self.__speed = 200.0   #How fast the player can run around.
         self.__vx = 0.0 #Player velocity on the X axis.
         self.__vy = 0.0#Player velocity on the Y axis.
 
