@@ -156,23 +156,6 @@ def main():
         deltaT = time.time() - currentTime
         if (gw.closed): #When the window is closed the gameloop finishes
             done = True
-
-def circleRect(cx,cy,r,rx,ry,rw,rh):
-    testX = cx
-    testY = cy
-
-    if (cx < rx): testX = rx
-    elif (cx > (rx +rw)): testX = rx+rw
-
-    if (cy < ry): testY = ry
-    elif (cy>(ry+rh)): testY = ry + rh
-
-    distX = cx-testX
-    distY = cy-testY
-    distance = sqrt((distX*distX) + (distY*distY))
-
-    return (distance <= r)
-
 def lineRect(x1,y1,x2,y2,rx,ry,rw,rh,edges):
     top, bottom, left, right = edges
 
@@ -305,5 +288,4 @@ def pathfind(grid,start:TileBase,end:TileBase):
     return False
 
 makeGrid()
-test()
 main() #Calling this starts the game loop.
