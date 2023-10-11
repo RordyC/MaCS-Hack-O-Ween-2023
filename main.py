@@ -27,6 +27,11 @@ monster = Monster() #Monster object that chases the player around the map.
 
 sightLine = Line(player.getPos(),monster.getPos())
 sightLine.setFill("red")
+
+testRect = Rectangle(Point(400,400),Point(464,464))
+testRect.setFill("white")
+testRect.draw(gw)
+
 mousePosTxt = Text(Point(100, 25), f"Mouse Pos: {0},{0}")
 gridIndexTxt = Text(Point(100, 50), f"Grid Index: {0},{0}")
 gridIndexTxt.setTextColor("orange")
@@ -68,9 +73,6 @@ def main():
 
     print(len(grid))
 
-    cx = 0
-    cy = 0
-
     sx = 57
     sy = 57
     sw = 57
@@ -87,7 +89,26 @@ def main():
         global sightLine
         sightLine.undraw()
         sightLine = Line(player.getPos(),monster.getPos())
-        sightLine.setFill("red")
+
+        los = True
+        """
+        for ir, row in enumerate(grid):
+            for ic, tile in enumerate(row):
+                if (lineRect(monster.getPos().x,
+                             monster.getPos().y,
+                             player.getPos().x,
+                             player.getPos().y,ir * 32,ic*32,32,32, tile.getEdges())):
+                    los = False
+                    break
+        """
+        if lineRect(monster.getPos().x,
+                             monster.getPos().y,
+                             player.getPos().x,
+                             player.getPos().y,400,400,64,64, (True,True,True,True)):
+
+            sightLine.setFill("cyan")
+        else:
+            sightLine.setFill("red")
         sightLine.draw(gw)
 
         if (gw.checkKey() == 'v'):
@@ -99,7 +120,7 @@ def main():
 
 
         cx = player.getPos().x
-        cy =player.getPos().y
+        cy = player.getPos().y
 
         sx = monster.getPos().x - 57/2
         sy = monster.getPos().y - 57/2
@@ -111,6 +132,12 @@ def main():
         if (inputHandler.getMousePressed()):
             if (selectedTile.getState() == 0 or selectedTile.getState() == 5):
                 selectedTile.updateState(1)
+                #Grid updated
+                for row in grid:
+                    for tile in row:
+                        tile.updateNeighbors(grid)
+            if (selectedTile.getState() == 1 and gw.checkMouse()):
+                print(selectedTile.getEdges())
 
 
         monster.hit(circleRect(cx, cy, 25, sx, sy,57,57))
@@ -145,13 +172,15 @@ def circleRect(cx,cy,r,rx,ry,rw,rh):
 
     return (distance <= r)
 
-def lineRect(x1,y1,x2,y2,rx,ry,rw,rh):
+def lineRect(x1,y1,x2,y2,rx,ry,rw,rh,edges):
+    top, bottom, left, right = edges
 
-    left = lineLine(x1, y1, x2, y2, rx, ry, rx, ry + rh)
-    right = lineLine(x1, y1, x2, y2, rx + rw, ry, rx + rw, ry + rh)
-    top = lineLine(x1, y1, x2, y2, rx, ry, rx + rw, ry)
-    bottom = lineLine(x1, y1, x2, y2, rx, ry + rh, rx + rw, ry + rh)
-    return (left or right or top or bottom)
+    if edges[0]: top = lineLine(x1, y1, x2, y2, rx, ry, rx + rw, ry)
+    if edges[1]: bottom = lineLine(x1, y1, x2, y2, rx, ry + rh, rx + rw, ry + rh)
+    if edges[2]: left = lineLine(x1, y1, x2, y2, rx, ry, rx, ry + rh)
+    if edges[3]: right = lineLine(x1, y1, x2, y2, rx + rw, ry, rx + rw, ry + rh)
+
+    return left or right or top or bottom
 def lineLine(x1,y1,x2,y2,x3,y3,x4,y4):
     uA = ((x4-x3)*(y1-y3) - (y4-y3)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1))
     uB = ((x2-x1)*(y1-y3) - (y2-y1)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1))
@@ -250,7 +279,7 @@ def pathfind(grid,start:TileBase,end:TileBase):
             return True
 
         for neighbor in current.neighbors:
-            temp_g_score = g_score[current] + 0
+            temp_g_score = g_score[current] + 1
 
             if temp_g_score < g_score[neighbor]:
                 came_from[neighbor] = current
