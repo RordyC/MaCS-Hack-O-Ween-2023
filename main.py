@@ -15,16 +15,18 @@ from time import *
 from tilebase import *
 from queue import PriorityQueue
 
-width = 512
-height = 512
+width = 705
+height = 705
 
-gw = GraphWin("GAME", width, height,autoflush=True) #This is the window where all the grapics are drawn.
+gw = GraphWin("GAME", width, height,autoflush=False) #This is the window where all the grapics are drawn.
 
 inputHandler = InputHandler() #Object that recieves input from the window.
 
 player = Player(Point(width/2,height/2),inputHandler) #Player object that is controller by user.
 monster = Monster() #Monster object that chases the player around the map.
 
+sightLine = Line(player.getPos(),monster.getPos())
+sightLine.setFill("red")
 mousePosTxt = Text(Point(100, 25), f"Mouse Pos: {0},{0}")
 gridIndexTxt = Text(Point(100, 50), f"Grid Index: {0},{0}")
 gridIndexTxt.setTextColor("orange")
@@ -48,7 +50,6 @@ def main():
     gw.setBackground("black")
     gw.setInputHandler(inputHandler) #We pass in the input handler to the window so it can recieve input!
 
-
     for row in range(len(grid)):
         for col in range(len(grid[row])):
             grid[row][col].draw(gw)
@@ -64,6 +65,7 @@ def main():
 
     monster.draw(gw)
     player.draw(gw)
+
     print(len(grid))
 
     cx = 0
@@ -82,6 +84,19 @@ def main():
         monster.update(deltaT)
         player.update(deltaT)
         updateEndPos()
+        global sightLine
+        sightLine.undraw()
+        sightLine = Line(player.getPos(),monster.getPos())
+        sightLine.setFill("red")
+        sightLine.draw(gw)
+
+        if (gw.checkKey() == 'v'):
+            print("Showing grid: ")
+
+            for row in grid:
+                for tile in row:
+                    tile.toggleDebug(True)
+
 
         cx = player.getPos().x
         cy =player.getPos().y
@@ -92,10 +107,10 @@ def main():
         col = inputHandler.getMousePos()[0] // gridSize
         row = inputHandler.getMousePos()[1] // gridSize
         gridIndexTxt.setText(f"Grid Index: [{row}][{col}]")
-        if (gw.checkMouse()):
-            grid[row][col].updateState(1)
-            grid[row][col].updateNeighbors(grid)
-            grid[row][col].printNeighbors()
+        selectedTile: TileBase = grid[row][col]
+        if (inputHandler.getMousePressed()):
+            if (selectedTile.getState() == 0 or selectedTile.getState() == 5):
+                selectedTile.updateState(1)
 
 
         monster.hit(circleRect(cx, cy, 25, sx, sy,57,57))
@@ -130,6 +145,23 @@ def circleRect(cx,cy,r,rx,ry,rw,rh):
 
     return (distance <= r)
 
+def lineRect(x1,y1,x2,y2,rx,ry,rw,rh):
+
+    left = lineLine(x1, y1, x2, y2, rx, ry, rx, ry + rh)
+    right = lineLine(x1, y1, x2, y2, rx + rw, ry, rx + rw, ry + rh)
+    top = lineLine(x1, y1, x2, y2, rx, ry, rx + rw, ry)
+    bottom = lineLine(x1, y1, x2, y2, rx, ry + rh, rx + rw, ry + rh)
+    return (left or right or top or bottom)
+def lineLine(x1,y1,x2,y2,x3,y3,x4,y4):
+    uA = ((x4-x3)*(y1-y3) - (y4-y3)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1))
+    uB = ((x2-x1)*(y1-y3) - (y2-y1)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1))
+
+    if (uA >= 0 and uA <= 1 and uB >= 0 and uB <= 1):
+        intX = x1 + (uA * (x2-x1))
+        intY = y1 + (uA * (y2-y1))
+        return True
+
+    else: return False
 def makeGrid():
     rows = int(height/gridSize)
     columns = int(width/gridSize)
@@ -149,28 +181,30 @@ def makeGrid():
 def updateEndPos():
     global startTile
     global endTile
-    row = int(player.getPos().x // gridSize)
-    col = int(player.getPos().y // gridSize)
+    targetRow = int(player.getPos().x // gridSize)
+    targetCol = int(player.getPos().y // gridSize)
 
     startRow = int((monster.getPos().y - 16) // gridSize)
     startCol = int((monster.getPos().x )// gridSize)
 
     currentStart = grid[startRow][startCol]
+    currentTarget = grid[targetCol][targetRow]
+
+    if (currentStart.getState() == 1 or currentTarget.getState() == 1):
+        return
+
     if (startTile != None and startTile != currentStart):
         startTile.updateState(0)
         startTile = currentStart
         startTile.updateState(3)
-
     else: startTile = currentStart
 
-
-    currentTile = grid[col][row]
     if (endTile == None or startTile == None):
         return
 
-    if not (endTile == currentTile):
+    if not (endTile == currentTarget):
         endTile.updateState(0)
-        endTile = currentTile
+        endTile = currentTarget
         endTile.updateState(4)
         pathfind(grid, startTile, endTile)
 
@@ -206,7 +240,6 @@ def pathfind(grid,start:TileBase,end:TileBase):
     g_score[start] = 0
     f_score = {spot: float("inf") for row in grid for spot in row}
     f_score[start] = heuristic(start.getPos(), end.getPos())
-
     while not open_set.empty():
         current = open_set.get()[2]
         open_set_hash.remove(current)

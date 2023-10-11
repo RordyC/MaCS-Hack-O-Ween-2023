@@ -1,33 +1,32 @@
-
+import graphics
 from graphics import *
 
 class TileBase:
 
     def __init__(self,row,col,width,total_rows):
-
-        self.drawPaths = False
-
+        self.win:graphics.GraphWin = None
         self.row = row
         self.col = col
         self.width = width
         self.total_rows = total_rows
         self.rect = Rectangle(Point(self.col * self.width,self.row * self.width),
                               Point(((self.col * self.width) + self.width),(self.row * self.width) +self.width))
-
-        self.rect.setFill("BLACK")
-        self.rect.setOutline("GREEN")
-
+        darkGrey = color_rgb(26,26,26)
         self.state = 0
-        self.stateColors = {0:"BLACK",1:"WHITE",2:"BLACK",3:"ORANGE",4:"CYAN",5:"BLACK",6:"Purple"}
-        self.stateOutlines = {0: "GREEN", 1: "GREEN", 2: "YELLOW", 3: "GREEN", 4: "GREEN",5:"GREEN",6:"GREEN"}
+        self.stateColors = {0:darkGrey,1:"WHITE",2:darkGrey,3:"ORANGE",4:"CYAN",5:darkGrey,6:"Purple"}
+        self.stateOutlines = {0: "blaCK", 1: "blaCK", 2: "CYAN", 3: "blaCK", 4: "blaCK",5:"black",6:"blaCK"}
+
         self.neighbors = []
+
+        self.isDrawn = False
+        self.showDebug = False
+
         self.score = Text(Point((self.col * self.width) + 24, (self.row * self.width) + 8), "inf")
         self.score.setSize(8)
-        self.score.setTextColor("WHITE")
-        self.score.setTextColor("brown")
+        self.score.setTextColor("grey")
 
         self.gCostTxt = Text(Point((self.col * self.width) + 8, (self.row * self.width) + 8), "inf")
-        self.gCostTxt.setTextColor("white")
+        self.gCostTxt.setTextColor("grey")
         self.gCostTxt.setSize(8)
         self.fCostTxt = Text(Point((self.col * self.width) + 16, (self.row * self.width) + 22), "0")
         self.fCostTxt.setTextColor("white")
@@ -35,21 +34,31 @@ class TileBase:
     def getPos(self):
         return self.row, self.col
     def draw(self,win):
-        if (True):
-            self.rect.draw(win)
+        self.rect.draw(win)
+        self.win = win
 
-            if (self.drawPaths):
-                self.score.draw(win)
-                self.gCostTxt.draw(win)
-                self.fCostTxt.draw(win)
+        self.__updateVisuals()
     def updateState(self,newState:int):
         self.state = newState
-
-        if not self.drawPaths and newState != 1:
-            return
-        self.rect.setFill(self.stateColors[self.state])
-        self.rect.setOutline(self.stateOutlines[self.state])
-
+        self.__updateVisuals()
+    def __updateVisuals(self):
+        if self.showDebug:
+            if not self.isDrawn:
+                self.isDrawn = True
+                self.rect.draw(self.win)
+            self.rect.setFill(self.stateColors[self.state])
+            self.rect.setOutline(self.stateOutlines[self.state])
+        else:
+            if (self.state == 1):
+                if not self.isDrawn:
+                    self.isDrawn = True
+                    self.rect.draw(self.win)
+                    self.win.lower(self.rect.id)
+                self.rect.setFill("white")
+                self.rect.setOutline("black")
+            else:
+                self.rect.undraw()
+                self.isDrawn = False
     def updateNeighbors(self,grid):
         self.neighbors = []
 
@@ -70,13 +79,31 @@ class TileBase:
         #Upper Right
         #Lower Left
         #Lower Right
+
+    def toggleDebug(self,show:bool):
+        if not (self.showDebug):
+            self.showDebug = True
+            self.__updateVisuals()
+            self.score.draw(self.win)
+            self.win.lower(self.rect.id)
+            self.gCostTxt.draw(self.win)
+            self.fCostTxt.draw(self.win)
+
+
+            self.win.lower(self.score.id)
+            self.win.lower(self.gCostTxt.id)
+            self.win.lower(self.fCostTxt.id)
+            self.win.lower(self.rect.id)
+        else:
+            self.showDebug = False
+            self.__updateVisuals()
+            self.score.undraw()
+            self.gCostTxt.undraw()
+            self.fCostTxt.undraw()
+
+
     def getState(self) -> int:
         return self.state
-    def printNeighbors(self):
-        print("_______")
-        for n in self.neighbors:
-
-            print(n.getPos())
     def setHCostText(self,score):
         self.score.setText(str(score))
 

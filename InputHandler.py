@@ -3,11 +3,22 @@ class InputHandler(object):
         self.__mouseX = 0
         self.__mouseY = 0
 
+        self.__lmb = False
+
         self.__currentKey = ""
         self.__wKey = False
         self.__sKey = False
         self.__aKey = False
         self.__dKey = False
+
+        self.__vKey = False
+
+    def lmbReleased(self):
+        self.__lmb = False
+
+    def lmbPressed(self):
+        self.__lmb = True
+
     def keyPressed(self, evnt):
         evnt = evnt.lower()
         if (evnt != self.__currentKey):
@@ -21,6 +32,8 @@ class InputHandler(object):
                 self.__aKey = True
             if (evnt == "d"):
                 self.__dKey = True
+            if (evnt == 'v'):
+                self.__vKey = True
 
     def keyReleased(self, evnt):
         evnt = evnt.lower()
@@ -36,6 +49,8 @@ class InputHandler(object):
             self.__aKey = False
         if (evnt == "d"):
             self.__dKey = False
+        if (evnt == 'v'):
+            self.__vKey = False
 
     def getYAxis(self) -> int:
         if (self.__wKey and self.__sKey):
@@ -55,6 +70,9 @@ class InputHandler(object):
             return -1
         else:
             return 0
+
+    def getMousePressed(self) -> bool:
+        return self.__lmb
     def onMotion(self,evnt):
         self.__mouseX = evnt.x
         self.__mouseY = evnt.y

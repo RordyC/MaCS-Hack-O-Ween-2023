@@ -4,7 +4,7 @@ from InputHandler import *
 class Player():
     def __init__(self, playerStart:Point,inputHandler:InputHandler):
         self.__inputHandler = inputHandler #Using this we can get direction the player wants to move!
-        self.__circle = Circle(playerStart, 20)
+        self.__circle = Circle(playerStart, 16)
         self.__circle.setFill("orange")
         self.__circle.setOutline("brown")
 
