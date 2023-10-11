@@ -225,6 +225,7 @@ class GraphWin(tk.Canvas):
         self.mouseX = None
         self.mouseY = None
         self.bind("<Button-1>", self._onClick)
+        self.bind("<ButtonRelease-1>", self._onLMBRelease)
         self.bind_all("<Key>", self._onKey)
         self.bind_all("<KeyRelease>", self._onKeyRelease)
         self.bind('<Motion>',self._onMotion)
@@ -269,6 +270,12 @@ class GraphWin(tk.Canvas):
     def _onKeyRelease(self, evnt):
         if self.__inputHandler != None:
             self.__inputHandler.keyReleased(evnt.keysym)
+    def _onLMBRelease(self,evnt):
+        if self.__inputHandler != None:
+            self.__inputHandler.lmbReleased()
+    def _onLMBPress(self,evnt):
+        if self.__inputHandler != None:
+            self.__inputHandler.lmbPressed()
 
     def setBackground(self, color):
         """Set background color of the window"""
@@ -395,6 +402,7 @@ class GraphWin(tk.Canvas):
         self._mouseCallback = func
 
     def _onClick(self, e):
+        self.__inputHandler.lmbPressed()
         self.mouseX = e.x
         self.mouseY = e.y
         if self._mouseCallback:
