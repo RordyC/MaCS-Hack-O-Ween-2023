@@ -8,7 +8,7 @@ class Player(object):
         self.__circle.setFill("purple")
         self.__circle.setOutline("red")
 
-        self.__speed = 400.0   #How fast the player can run around.
+        self.__speed = 4000.0   #How fast the player can run around.
         self.__vx = 0.0 #Player velocity on the X axis.
         self.__vy = 0.0#Player velocity on the Y axis.
 
