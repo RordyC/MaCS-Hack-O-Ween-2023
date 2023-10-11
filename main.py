@@ -14,6 +14,7 @@ from graphics import *
 from time import *
 from tilebase import *
 from queue import PriorityQueue
+from Collisions import *
 
 width = 705
 height = 705
@@ -304,4 +305,5 @@ def pathfind(grid,start:TileBase,end:TileBase):
     return False
 
 makeGrid()
+test()
 main() #Calling this starts the game loop.
