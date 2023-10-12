@@ -1,5 +1,4 @@
 from graphics import *
-from math import sqrt
 from InputHandler import *
 class Player():
     def __init__(self, playerStart:Point,inputHandler:InputHandler):
