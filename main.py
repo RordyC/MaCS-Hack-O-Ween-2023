@@ -152,25 +152,6 @@ def main():
         deltaT = time.time() - currentTime
         if (gw.closed): #When the window is closed the gameloop finishes
             done = True
-def lineRect(x1,y1,x2,y2,rx,ry,rw,rh,edges):
-    top, bottom, left, right = edges
-
-    if edges[0]: top = lineLine(x1, y1, x2, y2, rx, ry, rx + rw, ry)
-    if edges[1]: bottom = lineLine(x1, y1, x2, y2, rx, ry + rh, rx + rw, ry + rh)
-    if edges[2]: left = lineLine(x1, y1, x2, y2, rx, ry, rx, ry + rh)
-    if edges[3]: right = lineLine(x1, y1, x2, y2, rx + rw, ry, rx + rw, ry + rh)
-
-    return left or right or top or bottom
-def lineLine(x1,y1,x2,y2,x3,y3,x4,y4):
-    uA = ((x4-x3)*(y1-y3) - (y4-y3)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1))
-    uB = ((x2-x1)*(y1-y3) - (y2-y1)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1))
-
-    if (uA >= 0 and uA <= 1 and uB >= 0 and uB <= 1):
-        intX = x1 + (uA * (x2-x1))
-        intY = y1 + (uA * (y2-y1))
-        return True
-
-    else: return False
 def makeGrid():
     rows = int(height/gridSize)
     columns = int(width/gridSize)
