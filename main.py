@@ -1,11 +1,7 @@
 #Rordy 20/11/23
 #Tyler
 #Add your names here!!
-import math
-import random
-import time
 
-#import winsound #winsound.PlaySound("ui_menu_button_beep_13", winsound.SND_FILENAME | winsound.SND_ASYNC)
 import graphics
 from Monster import *
 from Player import Player
