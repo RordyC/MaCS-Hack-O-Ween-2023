@@ -31,6 +31,8 @@ testRect.draw(gw)
 
 mousePosTxt = Text(Point(100, 25), f"Mouse Pos: {0},{0}")
 gridIndexTxt = Text(Point(100, 50), f"Grid Index: {0},{0}")
+rayTxt = Text(Point(100, 100),f"Ray Unit Step Size: {0},{0}")
+rayTxt.setTextColor("lightgreen")
 gridIndexTxt.setTextColor("orange")
 mousePosTxt.setTextColor("cyan")
 
@@ -64,6 +66,7 @@ def main():
     runtimeTxt.draw(gw)
     fpsTxt.draw(gw)
     gridIndexTxt.draw(gw)
+    rayTxt.draw(gw)
 
     monster.draw(gw)
     player.draw(gw)
@@ -98,6 +101,11 @@ def main():
                     los = False
                     break
         """
+        rayIntersection = [0,0]
+      #  if (targetTileFound):
+            #rayIntersection = rayStart + rayDir * rayDist
+
+        """
         if lineRect(monster.getPos().x,
                              monster.getPos().y,
                              player.getPos().x,
@@ -107,8 +115,15 @@ def main():
         else:
             sightLine.setFill("red")
         sightLine.draw(gw)
+        """
 
-        if (gw.checkKey() == 'v'):
+        if (dda()):
+            sightLine.setFill("red")
+        else:
+            sightLine.setFill("cyan")
+        sightLine.draw(gw)
+
+        if gw.checkKey() == 'v':
             print("Showing grid: ")
 
             for row in grid:
@@ -202,12 +217,64 @@ def updateEndPos():
 def heuristic(start:Point,end:Point):
     return (abs(end[0] - start[0]) + abs(end[1]-start[1]))
 
+def dda():
+    rayStart = [int(monster.getPos().x // gridSize), int(monster.getPos().y // gridSize)]
+    rayDir = monster.getPlayerDir()
+
+    rayUnitStepSize = [sqrt(1 + (rayDir[1] / rayDir[0]) * (rayDir[1] / rayDir[0])),
+                       sqrt(1 + (rayDir[0] / rayDir[1]) * (rayDir[0] / rayDir[1]))]
+    rayTxt.setText(f"Ray Unit Step Size: {rayUnitStepSize[0].__round__(2)},{rayUnitStepSize[1].__round__(2)}")
+
+    mapCheck = [int(player.getPos().x // gridSize), int(player.getPos().y // gridSize)]
+    rayLength1D = [0, 0]
+    step: list[int] = [1, 1]
+
+    if rayDir[0] < 0:
+        step[0] = -1
+        rayLength1D[0] = (rayStart[0] - float(mapCheck[0]) * rayUnitStepSize[0])
+    else:
+        step[0] = 1
+        rayLength1D[0] = (float(mapCheck[0] - rayStart[0]) * rayUnitStepSize[0])
+
+    if (rayDir[1] < 0):
+        rayLength1D[0] = (rayStart[1] - float(mapCheck[1]) * rayUnitStepSize[1])
+        step[1] = -1
+
+    else:
+        rayLength1D[0] = (float(mapCheck[1] - rayStart[1]) * rayUnitStepSize[1])
+        step[1] = 1
+
+    targetTileFound = False
+    maxRayDist = 100.0
+    rayDist = 0.0
+    while not targetTileFound and rayDist < maxRayDist:
+        if (rayLength1D[0] < rayLength1D[1]):
+            mapCheck[0] += step[0]
+            rayLength1D[0] += rayUnitStepSize[0]
+
+            rayDist = rayLength1D[0]
+        else:
+            mapCheck[1] += step[1]
+            rayLength1D[1] += rayUnitStepSize[1]
+            rayDist = rayLength1D[1]
+
+        if (mapCheck[0] >= 0 and mapCheck[0] < 21) and (mapCheck[1] >= 0 and mapCheck[1] < 21):
+            #grid[mapCheck[1]][mapCheck[0]].updateState(1)
+
+            if (grid[mapCheck[1]][mapCheck[0]].getState() == 1):
+                targetTileFound = True
+                print("BALLS")
+    return targetTileFound
+
 def reconstruct_path(cameFrom,current):
     count = 0
+    path = []
     while current in cameFrom:
         count += 1
+        path.insert(0,current.getPos())
         current = cameFrom[current]
         current.updateState(6)
+    monster.updatePath(path)
     print(count)
 def pathfind(grid,start:TileBase,end:TileBase):
     print('Calling A*')
