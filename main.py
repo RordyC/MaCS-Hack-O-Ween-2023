@@ -25,6 +25,8 @@ monster = Monster() #Monster object that chases the player around the map.
 sightLine = Line(player.getPos(),monster.getPos())
 sightLine.setFill("red")
 
+testLine = Line(player.getPos(),monster.getPos())
+testLine.setFill("green")
 testRect = Rectangle(Point(400,400),Point(464,464))
 testRect.setFill("white")
 testRect.draw(gw)
@@ -41,7 +43,9 @@ runtimeTxt = Text(Point(400, 25), "")
 fpsTxt = Text(Point(400, 50), "")
 
 deltaT = -1.0
-gridSize = 32
+gridSizeX = 22
+gridSizeY = 22
+gridCellSize = 32
 grid = []
 endTile: TileBase = None
 startTile: TileBase = None
@@ -137,8 +141,13 @@ def main():
         sx = monster.getPos().x - 57/2
         sy = monster.getPos().y - 57/2
 
-        col = inputHandler.getMousePos()[0] // gridSize
-        row = inputHandler.getMousePos()[1] // gridSize
+        col = inputHandler.getMousePos()[0] // gridCellSize
+        if not (col < gridSizeX):
+            col = 0
+
+        row = inputHandler.getMousePos()[1] // gridCellSize
+        if not (row < gridSizeY):
+            row = 0
         gridIndexTxt.setText(f"Grid Index: [{row}][{col}]")
         selectedTile: TileBase = grid[row][col]
         if (inputHandler.getMousePressed()):
@@ -154,8 +163,6 @@ def main():
 
         monster.hit(circleRect(cx, cy, 25, sx, sy,57,57))
 
-
-
         runTime = (deltaT*1000).__round__(1)
         mousePosTxt.setText(f"Mouse Pos: {inputHandler.getMousePos()}")
         runtimeTxt.setText(f"Run Time: {str(runTime)}ms")
@@ -168,13 +175,13 @@ def main():
         if (gw.closed): #When the window is closed the gameloop finishes
             done = True
 def makeGrid():
-    rows = int(height/gridSize)
-    columns = int(width/gridSize)
+    rows = gridSizeX
+    columns = gridSizeY
     count = 0
     for row in range(rows):
         row_list = []
         for col in range(columns):
-            tile = TileBase(row,col,gridSize,rows)
+            tile = TileBase(row,col,gridCellSize,rows)
             row_list.append(tile)
             count +=1
         grid.append(row_list)
@@ -186,11 +193,11 @@ def makeGrid():
 def updateEndPos():
     global startTile
     global endTile
-    targetRow = int(player.getPos().x // gridSize)
-    targetCol = int(player.getPos().y // gridSize)
+    targetRow = int(player.getPos().x // gridCellSize)
+    targetCol = int(player.getPos().y // gridCellSize)
 
-    startRow = int((monster.getPos().y - 16) // gridSize)
-    startCol = int((monster.getPos().x )// gridSize)
+    startRow = int((monster.getPos().y - 16) // gridCellSize)
+    startCol = int((monster.getPos().x - 16 )// gridCellSize)
 
     currentStart = grid[startRow][startCol]
     currentTarget = grid[targetCol][targetRow]
@@ -218,52 +225,66 @@ def heuristic(start:Point,end:Point):
     return (abs(end[0] - start[0]) + abs(end[1]-start[1]))
 
 def dda():
-    rayStart = [int(monster.getPos().x // gridSize), int(monster.getPos().y // gridSize)]
+    rayStart = [monster.getPos().x, monster.getPos().y]
     rayDir = monster.getPlayerDir()
 
-    rayUnitStepSize = [sqrt(1 + (rayDir[1] / rayDir[0]) * (rayDir[1] / rayDir[0])),
-                       sqrt(1 + (rayDir[0] / rayDir[1]) * (rayDir[0] / rayDir[1]))]
+    rayUnitStepSize = [ sqrt(1 + (rayDir[1]/rayDir[0]) * (rayDir[1]/rayDir[0])),
+                        sqrt(1 + (rayDir[0]/rayDir[1]) * (rayDir[0]/rayDir[1])) ]
     rayTxt.setText(f"Ray Unit Step Size: {rayUnitStepSize[0].__round__(2)},{rayUnitStepSize[1].__round__(2)}")
 
-    mapCheck = [int(player.getPos().x // gridSize), int(player.getPos().y // gridSize)]
-    rayLength1D = [0, 0]
-    step: list[int] = [1, 1]
+    mapCheck = [int(monster.getPos().x // gridCellSize), int(monster.getPos().y // gridCellSize)]
+    rayLength1D = [0.0, 0.0]
+    step = [1, 1]
 
     if rayDir[0] < 0:
         step[0] = -1
-        rayLength1D[0] = (rayStart[0] - float(mapCheck[0]) * rayUnitStepSize[0])
+        rayLength1D[0] = (rayStart[0] - (float(mapCheck[0] * gridCellSize))) / gridCellSize * rayUnitStepSize[0]
     else:
         step[0] = 1
-        rayLength1D[0] = (float(mapCheck[0] - rayStart[0]) * rayUnitStepSize[0])
+        rayLength1D[0] = ((float(mapCheck[0] + 1) * gridCellSize) - rayStart[0]) / gridCellSize * rayUnitStepSize[0]
 
-    if (rayDir[1] < 0):
-        rayLength1D[0] = (rayStart[1] - float(mapCheck[1]) * rayUnitStepSize[1])
+    if rayDir[1] < 0:
+        rayLength1D[1] = (rayStart[1] - (float(mapCheck[1] * gridCellSize))) / gridCellSize * rayUnitStepSize[1]
         step[1] = -1
-
     else:
-        rayLength1D[0] = (float(mapCheck[1] - rayStart[1]) * rayUnitStepSize[1])
+        rayLength1D[1] = (float((mapCheck[1] + 1) * gridCellSize) - rayStart[1]) / gridCellSize * rayUnitStepSize[1]
         step[1] = 1
 
     targetTileFound = False
     maxRayDist = 100.0
     rayDist = 0.0
-    while not targetTileFound and rayDist < maxRayDist:
+
+    global testLine
+    testLine.undraw()
+    testLine = Line(Point(0,1), Point(monster.getPos().x + rayDir[0], monster.getPos().y +rayDir[1]))
+    testLine.setFill("green")
+    testLine.draw(gw)
+
+    for row in grid:
+        for tile in row:
+            if not tile.getState() == (1):
+                tile.updateState(0)
+
+    while (not targetTileFound) and rayDist < maxRayDist:
         if (rayLength1D[0] < rayLength1D[1]):
             mapCheck[0] += step[0]
-            rayLength1D[0] += rayUnitStepSize[0]
-
             rayDist = rayLength1D[0]
+            rayLength1D[0] += rayUnitStepSize[0]
         else:
             mapCheck[1] += step[1]
-            rayLength1D[1] += rayUnitStepSize[1]
             rayDist = rayLength1D[1]
+            rayLength1D[1] += rayUnitStepSize[1]
 
-        if (mapCheck[0] >= 0 and mapCheck[0] < 21) and (mapCheck[1] >= 0 and mapCheck[1] < 21):
-            #grid[mapCheck[1]][mapCheck[0]].updateState(1)
+
+
+        if (mapCheck[0] >= 0 and mapCheck[0] < gridSizeX) and (mapCheck[1] >= 0 and mapCheck[1] < gridSizeY):
+            if not (grid[mapCheck[1]][mapCheck[0]].getState() == 1):
+                grid[mapCheck[1]][mapCheck[0]].updateState(2)
 
             if (grid[mapCheck[1]][mapCheck[0]].getState() == 1):
                 targetTileFound = True
-                print("BALLS")
+
+
     return targetTileFound
 
 def reconstruct_path(cameFrom,current):
@@ -275,10 +296,8 @@ def reconstruct_path(cameFrom,current):
         current = cameFrom[current]
         current.updateState(6)
     monster.updatePath(path)
-    print(count)
 def pathfind(grid,start:TileBase,end:TileBase):
-    print('Calling A*')
-
+    return
     for row in grid:
         for tile in row:
             if (tile.getState() == (2 or 3)):

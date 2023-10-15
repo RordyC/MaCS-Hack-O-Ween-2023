@@ -2,7 +2,7 @@ from graphics import *
 from math import sqrt
 class Monster():
     def __init__(self):
-        self.__movementSpeed = 100
+        self.__movementSpeed = 25
         self.__hasLineOfSight = True
         self.__currentTargetX = 0
         self.__currentTargetY = 0
