@@ -1,4 +1,4 @@
-# MaCS-Hack-O-Ween-2023
+# MaCS-Hack-O-Ween-2023 🎃
 Project for the MacEwan Computer Science Club 2023 Hackathon.
 
 This project was created in Python using only the 
