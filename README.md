@@ -1,7 +1,7 @@
 # MaCS-Hack-O-Ween-2023 🎃
 Project for the MacEwan Computer Science Club 2023 Hackathon.
 
-This project was created in Python using only the 
+This project was created in Python using only the grapics.py library created by John Zelle.
 
  # Features
  
