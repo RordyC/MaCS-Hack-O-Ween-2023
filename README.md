@@ -16,4 +16,4 @@ This project was created in Python using only the
 
 📈: [DDA Raycasting](https://til.zimventures.com/GameMaker/dda)
 
-♟️: [A* Pathfinding]((https://www.youtube.com/watch?v=-L-WgKMFuhE))
+♟️: [A* Pathfinding](https://www.youtube.com/watch?v=-L-WgKMFuhE)
