@@ -1,6 +1,7 @@
 #Rordy 20/11/23
 #Tyler
 #Add your names here!!
+import random
 
 import graphics
 from Monster import *
@@ -16,8 +17,10 @@ width = 705
 height = 705
 
 gw = GraphWin("GAME", width, height,autoflush=False) #This is the window where all the grapics are drawn.
+gw.setBackground("black")
 
 inputHandler = InputHandler() #Object that recieves input from the window.
+gw.setInputHandler(inputHandler)  # We pass in the input handler to the window so it can recieve input!
 
 player = Player(Point(width/2,height/2),inputHandler) #Player object that is controller by user.
 monster = Monster() #Monster object that chases the player around the map.
@@ -27,9 +30,6 @@ sightLine.setFill("red")
 
 testLine = Line(player.getPos(),monster.getPos())
 testLine.setFill("green")
-testRect = Rectangle(Point(400,400),Point(464,464))
-testRect.setFill("white")
-testRect.draw(gw)
 
 mousePosTxt = Text(Point(100, 25), f"Mouse Pos: {0},{0}")
 gridIndexTxt = Text(Point(100, 50), f"Grid Index: {0},{0}")
@@ -50,17 +50,37 @@ grid = []
 endTile: TileBase = None
 startTile: TileBase = None
 
-testRect = Rectangle(Point(0,0),Point(50,50))
-
 def main():
+    menu() #Calling this opens main menu.
+    game() #Calling this starts the game loop.
+
+def menu():
+    pass
+
+def game():
+
     global gw
     global deltaT
-    gw.setBackground("black")
-    gw.setInputHandler(inputHandler) #We pass in the input handler to the window so it can recieve input!
+
+    makeGrid()
+
+    walls = []
+    floors = []
+
+    door = Image(Point((64 * 5) + 2,64), "sprites/door.png")
+    door.draw(gw)
 
     for row in range(len(grid)):
         for col in range(len(grid[row])):
             grid[row][col].draw(gw)
+    for i in range(5):
+        wall = Image(Point(64 * i, 64), "sprites/wall.png")
+        wall.draw(gw)
+        walls.append(wall)
+    for i in range(5):
+        wall = Image(Point(64 * i, 128), "sprites/floor.png")
+        wall.draw(gw)
+        walls.append(wall)
 
 
     mousePosTxt.draw(gw)
@@ -77,11 +97,6 @@ def main():
 
     print(len(grid))
 
-    sx = 57
-    sy = 57
-    sw = 57
-    sh = 57
-
     done = False
     while not done:  # This will run until 'done' is False.
         currentTime = time.time()
@@ -90,41 +105,18 @@ def main():
         monster.update(deltaT)
         player.update(deltaT)
         updateEndPos()
+
+        gridEditing()
+
         global sightLine
         sightLine.undraw()
         sightLine = Line(player.getPos(),monster.getPos())
-
-        los = True
-        """
-        for ir, row in enumerate(grid):
-            for ic, tile in enumerate(row):
-                if (lineRect(monster.getPos().x,
-                             monster.getPos().y,
-                             player.getPos().x,
-                             player.getPos().y,ir * 32,ic*32,32,32, tile.getEdges())):
-                    los = False
-                    break
-        """
-        rayIntersection = [0,0]
-      #  if (targetTileFound):
-            #rayIntersection = rayStart + rayDir * rayDist
-
-        """
-        if lineRect(monster.getPos().x,
-                             monster.getPos().y,
-                             player.getPos().x,
-                             player.getPos().y,400,400,64,64, (True,True,True,True)):
-
-            sightLine.setFill("cyan")
-        else:
+        if (checkLineOfSight(monster.getPos().x,monster.getPos().y,monster.getPlayerDir(),monster.getPlayerDist())):
             sightLine.setFill("red")
-        sightLine.draw(gw)
-        """
-
-        if (dda()):
-            sightLine.setFill("red")
+            monster.updateLineOfSight(False)
         else:
             sightLine.setFill("cyan")
+            monster.updateLineOfSight(True)
         sightLine.draw(gw)
 
         if gw.checkKey() == 'v':
@@ -134,34 +126,10 @@ def main():
                 for tile in row:
                     tile.toggleDebug(True)
 
-
-        cx = player.getPos().x
-        cy = player.getPos().y
-
         sx = monster.getPos().x - 57/2
         sy = monster.getPos().y - 57/2
 
-        col = inputHandler.getMousePos()[0] // gridCellSize
-        if not (col < gridSizeX):
-            col = 0
-
-        row = inputHandler.getMousePos()[1] // gridCellSize
-        if not (row < gridSizeY):
-            row = 0
-        gridIndexTxt.setText(f"Grid Index: [{row}][{col}]")
-        selectedTile: TileBase = grid[row][col]
-        if (inputHandler.getMousePressed()):
-            if (selectedTile.getState() == 0 or selectedTile.getState() == 5):
-                selectedTile.updateState(1)
-                #Grid updated
-                for row in grid:
-                    for tile in row:
-                        tile.updateNeighbors(grid)
-            if (selectedTile.getState() == 1 and gw.checkMouse()):
-                print(selectedTile.getEdges())
-
-
-        monster.hit(circleRect(cx, cy, 25, sx, sy,57,57))
+        monster.hit(circleRect(player.getPos().x, player.getPos().y, 25, sx, sy,57,57))
 
         runTime = (deltaT*1000).__round__(1)
         mousePosTxt.setText(f"Mouse Pos: {inputHandler.getMousePos()}")
@@ -189,6 +157,30 @@ def makeGrid():
     global endTile
     endTile = grid[1][1]
     print(f'Grid Size: {count}')
+def gridEditing():
+    col = inputHandler.getMousePos()[0] // gridCellSize
+    if not (col < gridSizeX):
+        col = 0
+
+    row = inputHandler.getMousePos()[1] // gridCellSize
+    if not (row < gridSizeY):
+        row = 0
+    gridIndexTxt.setText(f"Grid Index: [{row}][{col}]")
+    selectedTile: TileBase = grid[row][col]
+    if (inputHandler.getMousePressed()):
+        if (selectedTile.getState() == 0 or selectedTile.getState() == 5):
+            selectedTile.updateState(1)
+            # Grid updated
+            for row in grid:
+                for tile in row:
+                    tile.updateNeighbors(grid)
+    if (inputHandler.getRMB()):
+        if (selectedTile.getState() == 1):
+            selectedTile.updateState(0)
+            # Grid updated
+            for row in grid:
+                for tile in row:
+                    tile.updateNeighbors(grid)
 
 def updateEndPos():
     global startTile
@@ -196,8 +188,8 @@ def updateEndPos():
     targetRow = int(player.getPos().x // gridCellSize)
     targetCol = int(player.getPos().y // gridCellSize)
 
-    startRow = int((monster.getPos().y - 16) // gridCellSize)
-    startCol = int((monster.getPos().x - 16 )// gridCellSize)
+    startRow = int((monster.getPos().y - gridCellSize/2) // gridCellSize)
+    startCol = int((monster.getPos().x - gridCellSize/2) // gridCellSize)
 
     currentStart = grid[startRow][startCol]
     currentTarget = grid[targetCol][targetRow]
@@ -224,9 +216,9 @@ def updateEndPos():
 def heuristic(start:Point,end:Point):
     return (abs(end[0] - start[0]) + abs(end[1]-start[1]))
 
-def dda():
-    rayStart = [monster.getPos().x, monster.getPos().y]
-    rayDir = monster.getPlayerDir()
+def checkLineOfSight(startX,startY,rayDirection:list[float],distance:float):
+    rayStart = [startX,startY]
+    rayDir = rayDirection
 
     rayUnitStepSize = [ sqrt(1 + (rayDir[1]/rayDir[0]) * (rayDir[1]/rayDir[0])),
                         sqrt(1 + (rayDir[0]/rayDir[1]) * (rayDir[0]/rayDir[1])) ]
@@ -251,20 +243,15 @@ def dda():
         step[1] = 1
 
     targetTileFound = False
-    maxRayDist = 100.0
+    maxRayDist = distance/gridCellSize - 1
     rayDist = 0.0
 
-    global testLine
-    testLine.undraw()
-    testLine = Line(Point(0,1), Point(monster.getPos().x + rayDir[0], monster.getPos().y +rayDir[1]))
-    testLine.setFill("green")
-    testLine.draw(gw)
-
+    '''
     for row in grid:
         for tile in row:
             if not tile.getState() == (1):
                 tile.updateState(0)
-
+    '''
     while (not targetTileFound) and rayDist < maxRayDist:
         if (rayLength1D[0] < rayLength1D[1]):
             mapCheck[0] += step[0]
@@ -278,12 +265,8 @@ def dda():
 
 
         if (mapCheck[0] >= 0 and mapCheck[0] < gridSizeX) and (mapCheck[1] >= 0 and mapCheck[1] < gridSizeY):
-            if not (grid[mapCheck[1]][mapCheck[0]].getState() == 1):
-                grid[mapCheck[1]][mapCheck[0]].updateState(2)
-
             if (grid[mapCheck[1]][mapCheck[0]].getState() == 1):
                 targetTileFound = True
-
 
     return targetTileFound
 
@@ -297,7 +280,6 @@ def reconstruct_path(cameFrom,current):
         current.updateState(6)
     monster.updatePath(path)
 def pathfind(grid,start:TileBase,end:TileBase):
-    return
     for row in grid:
         for tile in row:
             if (tile.getState() == (2 or 3)):
@@ -322,7 +304,7 @@ def pathfind(grid,start:TileBase,end:TileBase):
 
         if current == end:
             current.updateState(4)
-            reconstruct_path(came_from,end)
+            reconstruct_path(came_from, end)
             return True
 
         for neighbor in current.neighbors:
@@ -331,7 +313,7 @@ def pathfind(grid,start:TileBase,end:TileBase):
             if temp_g_score < g_score[neighbor]:
                 came_from[neighbor] = current
 
-                h_score = heuristic(end.getPos(),neighbor.getPos())
+                h_score = heuristic(end.getPos(), neighbor.getPos())
                 neighbor.setHCostText(h_score)
 
                 g_score[neighbor] = temp_g_score
@@ -350,5 +332,4 @@ def pathfind(grid,start:TileBase,end:TileBase):
             current.updateState(2)
     return False
 
-makeGrid()
-main() #Calling this starts the game loop.
+main()

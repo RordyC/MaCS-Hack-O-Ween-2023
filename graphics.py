@@ -226,6 +226,8 @@ class GraphWin(tk.Canvas):
         self.mouseY = None
         self.bind("<Button-1>", self._onClick)
         self.bind("<ButtonRelease-1>", self._onLMBRelease)
+        self.bind("<Button-3>", self._onRMBPress)
+        self.bind("<ButtonRelease-3>", self._onRMBRelease)
         self.bind_all("<Key>", self._onKey)
         self.bind_all("<KeyRelease>", self._onKeyRelease)
         self.bind('<Motion>',self._onMotion)
@@ -273,6 +275,13 @@ class GraphWin(tk.Canvas):
     def _onLMBRelease(self,evnt):
         if self.__inputHandler != None:
             self.__inputHandler.lmbReleased()
+
+    def _onRMBPress(self,evnt):
+        if self.__inputHandler != None:
+            self.__inputHandler.rmbPressed()
+    def _onRMBRelease(self,evnt):
+        if self.__inputHandler != None:
+            self.__inputHandler.rmbReleased()
     def _onLMBPress(self,evnt):
         if self.__inputHandler != None:
             self.__inputHandler.lmbPressed()

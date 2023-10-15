@@ -14,7 +14,7 @@ class TileBase:
                               Point(((self.col * self.width) + self.width), (self.row * self.width) + self.width))
         darkGrey = color_rgb(26, 26, 26)
         self.state = 0
-        self.stateColors = {0: darkGrey, 1: "WHITE", 2: "RED", 3: "ORANGE", 4: "CYAN", 5: darkGrey, 6: "Purple"}
+        self.stateColors = {0: darkGrey, 1: "WHITE", 2: darkGrey, 3: "ORANGE", 4: "CYAN", 5: darkGrey, 6: "Purple"}
         self.stateOutlines = {0: "blaCK", 1: "blaCK", 2: "CYAN", 3: "blaCK", 4: "blaCK", 5: "black", 6: "blaCK"}
 
         self.neighbors = []
