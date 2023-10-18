@@ -1,5 +1,3 @@
-
-from PIL import Image
 from graphics import *
 
 #original_image = Image.open("halloween.jpg")
