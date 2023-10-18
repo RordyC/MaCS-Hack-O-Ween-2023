@@ -130,3 +130,5 @@ class TileBase:
 
     def setFCostText(self, score):
         self.fCostTxt.setText(str(score))
+    def getGridPos(self):
+        return (self.row,self.col)
