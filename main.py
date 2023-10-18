@@ -12,8 +12,9 @@ from time import *
 from tilebase import *
 from queue import PriorityQueue
 from Collisions import *
+import pickle
 
-width = 705
+width = 705 + 256
 height = 705
 
 gw = GraphWin("GAME", width, height,autoflush=False) #This is the window where all the grapics are drawn.
@@ -49,6 +50,7 @@ gridCellSize = 32
 grid = []
 endTile: TileBase = None
 startTile: TileBase = None
+nearTiles = []
 
 def main():
     menu() #Calling this opens main menu.
@@ -61,9 +63,8 @@ def game():
 
     global gw
     global deltaT
-
     makeGrid()
-
+    #gw.setCoords(0+ 500,705,705 + 500,0)
     walls = []
     floors = []
 
@@ -104,6 +105,7 @@ def game():
         monster.setTargetPos(player.getPos().x,player.getPos().y)
         monster.update(deltaT)
         player.update(deltaT)
+        player.setCollisionTiles(nearTiles)
         updateEndPos()
 
         gridEditing()
@@ -157,6 +159,8 @@ def makeGrid():
     global endTile
     endTile = grid[1][1]
     print(f'Grid Size: {count}')
+
+
 def gridEditing():
     col = inputHandler.getMousePos()[0] // gridCellSize
     if not (col < gridSizeX):
@@ -181,27 +185,40 @@ def gridEditing():
             for row in grid:
                 for tile in row:
                     tile.updateNeighbors(grid)
+def updatePlayerCollision(row:int,col:int):
+    global nearTiles
+    nearTiles = []
 
+    for r in range(0,4):
+        for c in range(0,4):
+            try:
+                tile = grid[col - 2 + c][row - 2 + r]
+                if (tile.getState() == 1):
+                    nearTiles.append(tile)
+            except:
+                pass
+    print(f"nuts: {len(nearTiles)}")
 def updateEndPos():
     global startTile
     global endTile
     targetRow = int(player.getPos().x // gridCellSize)
     targetCol = int(player.getPos().y // gridCellSize)
 
+
     startRow = int((monster.getPos().y - gridCellSize/2) // gridCellSize)
     startCol = int((monster.getPos().x - gridCellSize/2) // gridCellSize)
 
     currentStart = grid[startRow][startCol]
     currentTarget = grid[targetCol][targetRow]
-
-    if (currentStart.getState() == 1 or currentTarget.getState() == 1):
+    updatePlayerCollision(targetRow, targetCol)
+    if (currentTarget.getState() == 1):
         return
-
-    if (startTile != None and startTile != currentStart):
-        startTile.updateState(0)
-        startTile = currentStart
-        startTile.updateState(3)
-    else: startTile = currentStart
+    if (currentStart.getState() != 1):
+         if (startTile != None and startTile != currentStart):
+             startTile.updateState(0)
+             startTile = currentStart
+             startTile.updateState(3)
+         else: startTile = currentStart
 
     if (endTile == None or startTile == None):
         return
@@ -211,8 +228,6 @@ def updateEndPos():
         endTile = currentTarget
         endTile.updateState(4)
         pathfind(grid, startTile, endTile)
-
-
 def heuristic(start:Point,end:Point):
     return (abs(end[0] - start[0]) + abs(end[1]-start[1]))
 
@@ -278,7 +293,8 @@ def reconstruct_path(cameFrom,current):
         path.insert(0,current.getPos())
         current = cameFrom[current]
         current.updateState(6)
-    monster.updatePath(path)
+    if len(path) > 0:
+        monster.updatePath(path)
 def pathfind(grid,start:TileBase,end:TileBase):
     for row in grid:
         for tile in row:

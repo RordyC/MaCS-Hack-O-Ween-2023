@@ -34,3 +34,20 @@ def lineLine(x1,y1,x2,y2,x3,y3,x4,y4):
         return True
 
     else: return False
+
+def circleRectMove(cx,potentialPosition:list[float],tileX,tileY):
+    nearestPoint = [0,0]
+    nearestPoint[0] = max(float(tileX), min(potentialPosition[0], float(tileX+32)))
+    nearestPoint[1] = max(float(tileY), min(potentialPosition[1], float(tileY+32)))
+    rayToNearest = [0,0]
+    rayToNearest[0] = nearestPoint[0] - potentialPosition[0]
+    rayToNearest[1] = nearestPoint[1] - potentialPosition[1]
+
+    rayMag = sqrt((rayToNearest[0]*rayToNearest[0])+(rayToNearest[1]*rayToNearest[1]))
+    overlap = cx - rayMag
+    if (overlap > 0):
+
+        potentialPosition[0] = potentialPosition[0] - (rayToNearest[0]/rayMag) * overlap
+        potentialPosition[1] = potentialPosition[1] - (rayToNearest[1]/rayMag) * overlap
+
+    return potentialPosition

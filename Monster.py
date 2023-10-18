@@ -1,8 +1,10 @@
+import math
+
 from graphics import *
 from math import sqrt
 class Monster():
     def __init__(self):
-        self.__movementSpeed = 100
+        self.__movementSpeed = 50
         self.__hasLineOfSight = True
         self.__currentTargetX = 0
         self.__currentTargetY = 0
@@ -97,10 +99,25 @@ class Monster():
         return self.__playerDir
     def getPlayerDist(self):
         return self.playerDistance
-
     def updatePath(self, path):
         self.__path = path
-        self.__currentPathTarget[0] = (path[0][1] * 32) + 16
-        self.__currentPathTarget[1] = (path[0][0] * 32) + 16
+
+        closestDistance = math.inf
+        closestInd = 0
+
+        for i, p in enumerate(path):
+            currentDist = (p[0] * p[0]) + (p[1] * p[1])
+            if (currentDist < closestDistance):
+                closestDistance = currentDist
+                print(closestDistance)
+                closestInd = i
+                break
+
+        for i in range(0, closestInd):
+            self.__path.pop(i)
+
+        target = self.__path.pop(0)
+        self.__currentPathTarget[0] = (target[1] * 32) + 16
+        self.__currentPathTarget[1] = (target[0] * 32) + 16
     def updateLineOfSight(self, los:bool):
         self.__hasLineOfSight = los
