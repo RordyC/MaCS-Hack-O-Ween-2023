@@ -52,12 +52,24 @@ endTile: TileBase = None
 startTile: TileBase = None
 nearTiles = []
 
+menuBackground = Image(Point(352, 352), 'blood.png')
+startButton = rect
+quitButton = rect
+startLabel =
+quitLabel =
 def main():
     menu() #Calling this opens main menu.
     game() #Calling this starts the game loop.
 
 def menu():
-    pass
+    isInMenu = True
+    menuBackground.draw(gw)
+
+    while isInMenu:
+        sleep(5)
+        isInMenu = False
+
+    menuBackground.undraw()
 
 def game():
 
