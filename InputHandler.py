@@ -4,6 +4,7 @@ class InputHandler(object):
         self.__mouseY = 0
 
         self.__lmb = False
+        self.__rmb = False
 
         self.__currentKey = ""
         self.__wKey = False
@@ -18,6 +19,12 @@ class InputHandler(object):
 
     def lmbPressed(self):
         self.__lmb = True
+
+    def rmbReleased(self):
+        self.__rmb = False
+
+    def rmbPressed(self):
+        self.__rmb = True
 
     def keyPressed(self, evnt):
         evnt = evnt.lower()
@@ -73,6 +80,8 @@ class InputHandler(object):
 
     def getMousePressed(self) -> bool:
         return self.__lmb
+    def getRMB(self) -> bool:
+        return self.__rmb
     def onMotion(self,evnt):
         self.__mouseX = evnt.x
         self.__mouseY = evnt.y
