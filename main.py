@@ -52,24 +52,64 @@ endTile: TileBase = None
 startTile: TileBase = None
 nearTiles = []
 
-menuBackground = Image(Point(352, 352), 'blood.png')
-startButton = rect
-quitButton = rect
-startLabel =
-quitLabel =
+
+
 def main():
     menu() #Calling this opens main menu.
     game() #Calling this starts the game loop.
 
+    
 def menu():
-    isInMenu = True
+    # all background info
+    white_background = Rectangle(Point(0, 0), Point(961, 705))
+    white_background.setFill('white')
+    white_background.draw(gw)
+    menuBackground = Image(Point(480, 352), 'blood.png')
+
+    # Title 
+    titleLabel = Text(Point(480, 100), 'THE GAME')
+    titleLabel.setSize(28)
+    titleLabel.setTextColor('black')
+    titleLabel.setStyle('bold italic')
+
+    # Start button
+    startLabel = Text(Point(480, 325), 'Start Game')
+    startLabel.setSize(20)
+    startLabel.setTextColor('white')
+    startLabel.setStyle('bold italic')
+
+    startButton = Rectangle(Point(353, 300), Point(607, 350))
+    startButton.setFill('lightgreen')
+
+    # Quit button
+    quitLabel = Text(Point( 480, 425), 'Exit To Desktop')
+    quitLabel.setSize(20)
+    quitLabel.setTextColor('white')
+    quitLabel.setStyle('bold italic')
+
+    quitButton = Rectangle(Point(353, 400), Point(607, 450))
+    quitButton.setFill('brown')
+    
+    # Draws Menu
     menuBackground.draw(gw)
-
-    while isInMenu:
-        sleep(5)
-        isInMenu = False
-
-    menuBackground.undraw()
+    titleLabel.draw(gw)
+    startButton.draw(gw)
+    startLabel.draw(gw)
+    quitButton.draw(gw)
+    quitLabel.draw(gw)
+    while True:
+            click_point = gw.checkMouse()
+            if click_point:
+                if 353 < click_point.getX() < 607:
+                    if 300 < click_point.getY() < 350:
+                        break
+                    elif 400 < click_point.getY() < 450:
+                        gw.close()
+    # Undraws menu and pauses for (1) second 
+    for item in gw.items[:]:
+        item.undraw()
+    gw.update()                    
+    sleep(1)               
 
 def game():
 
@@ -197,6 +237,7 @@ def gridEditing():
             for row in grid:
                 for tile in row:
                     tile.updateNeighbors(grid)
+                    
 def updatePlayerCollision(row:int,col:int):
     global nearTiles
     nearTiles = []
@@ -243,7 +284,7 @@ def updateEndPos():
 def heuristic(start:Point,end:Point):
     return (abs(end[0] - start[0]) + abs(end[1]-start[1]))
 
-def checkLineOfSight(startX,startY,rayDirection:list[float],distance:float):
+def checkLineOfSight(startX,startY,rayDirection:[float],distance):
     rayStart = [startX,startY]
     rayDir = rayDirection
 

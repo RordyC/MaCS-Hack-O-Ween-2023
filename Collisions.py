@@ -36,7 +36,7 @@ def lineLine(x1,y1,x2,y2,x3,y3,x4,y4):
 
     else: return False
 
-def circleRectMove(cx,potentialPosition:list[float],tileX,tileY):
+def circleRectMove(cx, potentialPosition,tileX,tileY):
     nearestPoint = [0,0]
     nearestPoint[0] = max(float(tileX), min(potentialPosition[0], float(tileX+32)))
     nearestPoint[1] = max(float(tileY), min(potentialPosition[1], float(tileY+32)))

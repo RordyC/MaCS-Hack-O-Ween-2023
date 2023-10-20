@@ -13,7 +13,7 @@ def create_label(win, x, y, text, size, color, style,):
     label.setStyle(style)
     label.draw(win)
     return label
-title = create_label(win, 350, 100, "THE GAME", 36, 'black', 'bold italic')
+title = create_label(gw, 350, 100, "THE GAME", 36, 'black', 'bold italic')
 
 play_button = create_button(gw, 252, 300, 452, 350, 'lightgreen')
 play_label = create_label(gw, 352, 325, 'Start', 14, 'white', 'bold italic')

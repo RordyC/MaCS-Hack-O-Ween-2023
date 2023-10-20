@@ -1,6 +1,7 @@
 from graphics import *
 from InputHandler import *
 from Collisions import circleRectMove
+
 class Player():
     def __init__(self, playerStart:Point,inputHandler:InputHandler):
         self.__inputHandler = inputHandler #Using this we can get direction the player wants to move!
@@ -17,7 +18,7 @@ class Player():
     def draw(self, gw: GraphWin):
             self.__circle.draw(gw)
 
-    def calculateTileCollisions(potPos:list[float]):
+    def calculateTileCollisions(potPos):
         newPos = circleRectMove(25, potPos, 10 * 32, 4 * 32)
         return newPos
 
