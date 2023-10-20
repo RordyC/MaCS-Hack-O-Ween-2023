@@ -160,7 +160,6 @@ def makeGrid():
     endTile = grid[1][1]
     print(f'Grid Size: {count}')
 
-
 def gridEditing():
     col = inputHandler.getMousePos()[0] // gridCellSize
     if not (col < gridSizeX):
@@ -191,25 +190,23 @@ def updatePlayerCollision(row:int,col:int):
 
     for r in range(0,4):
         for c in range(0,4):
-            try:
-                tile = grid[col - 2 + c][row - 2 + r]
-                if (tile.getState() == 1):
-                    nearTiles.append(tile)
-            except:
-                pass
-    print(f"nuts: {len(nearTiles)}")
+            rt = max(min(row - 2 + r,gridSizeY -1), 0)
+            ct = max(min(col - 2 + c,gridSizeX -1), 0)
+            tile = grid[rt][ct]
+            if (tile.getState() == 1):
+                nearTiles.append(tile)
 def updateEndPos():
     global startTile
     global endTile
-    targetRow = int(player.getPos().x // gridCellSize)
-    targetCol = int(player.getPos().y // gridCellSize)
+    targetRow = int(player.getPos().y // gridCellSize)
+    targetCol = int(player.getPos().x // gridCellSize)
 
 
     startRow = int((monster.getPos().y - gridCellSize/2) // gridCellSize)
     startCol = int((monster.getPos().x - gridCellSize/2) // gridCellSize)
 
     currentStart = grid[startRow][startCol]
-    currentTarget = grid[targetCol][targetRow]
+    currentTarget = grid[targetRow][targetCol]
     updatePlayerCollision(targetRow, targetCol)
     if (currentTarget.getState() == 1):
         return
