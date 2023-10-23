@@ -6,6 +6,7 @@ import random
 import graphics
 from Monster import *
 from Player import Player
+from Door import Door
 from InputHandler import *
 from graphics import *
 from time import *
@@ -39,6 +40,7 @@ rayTxt.setTextColor("lightgreen")
 gridIndexTxt.setTextColor("orange")
 mousePosTxt.setTextColor("cyan")
 
+testDoor = Door((64 * 5) + 2,64,0)
 
 runtimeTxt = Text(Point(400, 25), "")
 fpsTxt = Text(Point(400, 50), "")
@@ -67,10 +69,6 @@ def game():
     #gw.setCoords(0+ 500,705,705 + 500,0)
     walls = []
     floors = []
-
-    door = Image(Point((64 * 5) + 2,64), "sprites/door.png")
-    door.draw(gw)
-
     for row in range(len(grid)):
         for col in range(len(grid[row])):
             grid[row][col].draw(gw)
@@ -83,7 +81,7 @@ def game():
         wall.draw(gw)
         walls.append(wall)
 
-
+    testDoor.draw(gw)
     mousePosTxt.draw(gw)
     fpsTxt.setTextColor("yellow")
 
@@ -106,6 +104,7 @@ def game():
         monster.update(deltaT)
         player.update(deltaT)
         player.setCollisionTiles(nearTiles)
+        testDoor.update(deltaT)
         updateEndPos()
 
         gridEditing()
