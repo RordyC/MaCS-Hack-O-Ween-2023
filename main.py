@@ -13,16 +13,17 @@ from time import *
 from tilebase import *
 from queue import PriorityQueue
 from Collisions import *
+from WorldSprite import WorldSprite
 import pickle
 
 width = 705 + 256
 height = 705
 
-gw = GraphWin("GAME", width, height,autoflush=False) #This is the window where all the grapics are drawn.
+gw = GraphWin("GAME", width, height,autoflush=False) #This is the window where all the graphics are drawn.
 gw.setBackground("black")
 
-inputHandler = InputHandler() #Object that recieves input from the window.
-gw.setInputHandler(inputHandler)  # We pass in the input handler to the window so it can recieve input!
+inputHandler = InputHandler() #Object that receives input from the window.
+gw.setInputHandler(inputHandler)  # We pass in the input handler to the window, so it can receive input!
 
 player = Player(Point(width/2,height/2),inputHandler) #Player object that is controller by user.
 monster = Monster() #Monster object that chases the player around the map.
@@ -93,7 +94,8 @@ def game():
 
     monster.draw(gw)
     player.draw(gw)
-
+    sprite = WorldSprite(500,500,"wall",gw)
+    sprite.draw()
     testDoor.setTiles([grid[1][10],grid[1][9],grid[2][10],grid[2][9]])
 
     print(len(grid))
@@ -151,14 +153,13 @@ def makeGrid():
     rows = gridSizeX
     columns = gridSizeY
     count = 0
-    gridData = []
     with open('grid_data','rb') as f:
         gridData = pickle.load(f)
     for row in range(rows):
         row_list = []
         for col in range(columns):
             tile = TileBase(row,col,gridCellSize,rows)
-            tile.updateState(gridData[row][col] + 3)
+            tile.updateState(gridData[row][col])
             row_list.append(tile)
             count +=1
         grid.append(row_list)
