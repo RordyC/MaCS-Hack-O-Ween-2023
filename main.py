@@ -13,6 +13,7 @@ from tilebase import *
 from queue import PriorityQueue
 from Collisions import *
 import pickle
+#from Doors import Door
 
 width = 705 + 256
 height = 705
@@ -55,10 +56,10 @@ nearTiles = []
 
 
 def main():
-    menu() #Calling this opens main menu.
+    menu() #Calling this opens main menu
     game() #Calling this starts the game loop.
 
-    
+     
 def menu():
     # all background info
     white_background = Rectangle(Point(0, 0), Point(961, 705))
@@ -112,16 +113,33 @@ def menu():
     sleep(1)               
 
 def game():
-
+    collision_raidus = 25
     global gw
     global deltaT
     makeGrid()
+    game_over = False
+
     #gw.setCoords(0+ 500,705,705 + 500,0)
     walls = []
     floors = []
 
-    door = Image(Point((64 * 5) + 2,64), "sprites/door.png")
-    door.draw(gw)
+    lab_door = Image(Point((64 * 5) + 2,64), "sprites/door.png")
+    lab_door.draw(gw)
+
+    # key drawingsdda
+    keys = []
+    
+    key1 = Circle(Point(690, 85), 10)
+    key1.setFill('red')
+    #key2 = Circle(Point(200, 200), 10)
+    #key2.setFill('green')
+    key3 = Circle(Point(505, 636), 10)
+    key3.setFill('blue')
+    keys.extend([key1, key3])
+    keys_data = [{'color':'red','circle':key1, 'collected':False},
+                {'color':'blue','circle':key3, 'collected':False}]
+    for key in keys:
+        key.draw(gw)  
 
     for row in range(len(grid)):
         for col in range(len(grid[row])):
@@ -150,8 +168,9 @@ def game():
 
     print(len(grid))
 
-    done = False
-    while not done:  # This will run until 'done' is False.
+    game_over = False
+    while not game_over:  # This will run until 'done' is False.
+
         currentTime = time.time()
 
         monster.setTargetPos(player.getPos().x,player.getPos().y)
@@ -192,10 +211,25 @@ def game():
 
         time.sleep((0.1/1000))   #Calling this redraws everything on screen.
         gw.update()
-
+        
         deltaT = time.time() - currentTime
+        for key_data in keys_data:
+            # logic to check if keys are collected, undrawing them as well
+            if not key_data['collected']:
+                key_circle = key_data["circle"]
+                key_color = key_data['color']
+                if circleRect(player.getPos().x, player.getPos().y, 16, key_circle.getCenter().x, key_circle.getCenter().y, 10, 10):
+                    key_color = key_data['color']
+                    key_circle.undraw()  
+                    player.collect_keys(key_color)  
+                    key_data['collected'] = True  
+
+                
+        
         if (gw.closed): #When the window is closed the gameloop finishes
             done = True
+            
+
 def makeGrid():
     rows = gridSizeX
     columns = gridSizeY
