@@ -18,6 +18,8 @@ class Door():
         self.__isOpen = False
         self.__playerX = 0
         self.__playerY = 0
+
+        self.__tiles = []
     def draw(self, gw: GraphWin):
         self.__panelRight.draw(gw)
         self.__panelLeft.draw(gw)
@@ -36,11 +38,16 @@ class Door():
                 self.__panelRight.move(deltaT * -self.__doorSpeed, 0)
             if self.__panelLeft.getAnchor().x < self.__anchorLeft:
                 self.__panelLeft.move(deltaT * self.__doorSpeed, 0)
-    def open(self):
-        self.__isOpen = not self.__isOpen
+    def openDoor(self):
+        if (self.__isOpen == False):
+            self.__isOpen = not self.__isOpen
+            for tile in self.__tiles:
+                tile.updateState(0)
     def checkPlayer(self):
         if (pointCircle(self.__playerX,self.__playerY,self.__posX + 32,self.__posY+32,69)):
-            self.__isOpen = True
+            self.openDoor()
     def setPlayerCoords(self,playerX,playerY):
-        self.__playerX =playerX
+        self.__playerX = playerX
         self.__playerY = playerY
+    def setTiles(self, tiles):
+        self.__tiles = tiles

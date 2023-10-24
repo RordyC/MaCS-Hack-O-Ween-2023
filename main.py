@@ -94,6 +94,8 @@ def game():
     monster.draw(gw)
     player.draw(gw)
 
+    testDoor.setTiles([grid[1][10],grid[1][9],grid[2][10],grid[2][9]])
+
     print(len(grid))
 
     done = False
@@ -126,6 +128,8 @@ def game():
             for row in grid:
                 for tile in row:
                     tile.toggleDebug(True)
+        if gw.checkKey() == 'i':
+            saveWorld()
 
         sx = monster.getPos().x - 57/2
         sy = monster.getPos().y - 57/2
@@ -147,10 +151,14 @@ def makeGrid():
     rows = gridSizeX
     columns = gridSizeY
     count = 0
+    gridData = []
+    with open('grid_data','rb') as f:
+        gridData = pickle.load(f)
     for row in range(rows):
         row_list = []
         for col in range(columns):
             tile = TileBase(row,col,gridCellSize,rows)
+            tile.updateState(gridData[row][col] + 3)
             row_list.append(tile)
             count +=1
         grid.append(row_list)
@@ -343,5 +351,19 @@ def pathfind(grid,start:TileBase,end:TileBase):
         if current != start:
             current.updateState(2)
     return False
+def saveWorld():
+    print("Saving...")
+    gridData = []
+    for row in grid:
+        rowData = []
+        for col in row:
+            if (col.getState() == 1):
+                rowData.append(1)
+            else:
+                rowData.append(0)
+        gridData.append(rowData)
+    print(gridData)
 
+    with open('grid_data', 'wb') as f:
+        pickle.dump(gridData, f)
 main()
