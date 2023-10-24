@@ -105,6 +105,7 @@ def game():
         player.update(deltaT)
         player.setCollisionTiles(nearTiles)
         testDoor.update(deltaT)
+        testDoor.setPlayerCoords(player.getPos().x,player.getPos().y)
         updateEndPos()
 
         gridEditing()
@@ -122,7 +123,6 @@ def game():
 
         if gw.checkKey() == 'v':
             print("Showing grid: ")
-
             for row in grid:
                 for tile in row:
                     tile.toggleDebug(True)

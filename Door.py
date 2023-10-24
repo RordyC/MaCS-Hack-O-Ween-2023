@@ -1,4 +1,5 @@
 from graphics import *
+from Collisions import pointCircle
 class Door():
     def __init__(self,x,y,key):
         self.__posX = x
@@ -13,24 +14,33 @@ class Door():
         print(self.__panelRight.getAnchor().x)
         self.__anchorLeft = self.__panelLeft.getAnchor().x
 
-        self.speed = 4
-        self.open = True
+        self.__doorSpeed = 64
+        self.__isOpen = False
+        self.__playerX = 0
+        self.__playerY = 0
     def draw(self, gw: GraphWin):
         self.__panelRight.draw(gw)
         self.__panelLeft.draw(gw)
         self.__frameRight.draw(gw)
         self.__frameLeft.draw(gw)
         self.__anchorRight = self.__panelRight.getAnchor().x
-        self.__panelRight.move(self.speed,0)
-        self.__panelLeft.move(-self.speed,0)
     def update(self, deltaT):
-        if self.open:
+        self.checkPlayer()
+        if self.__isOpen:
             if self.__panelRight.getAnchor().x < self.__anchorRight + 32:
-                self.__panelRight.move(deltaT * self.speed, 0)
+                self.__panelRight.move(deltaT * self.__doorSpeed, 0)
             if self.__panelLeft.getAnchor().x > self.__anchorLeft - 32:
-                self.__panelLeft.move(deltaT * -self.speed, 0)
+                self.__panelLeft.move(deltaT * -self.__doorSpeed, 0)
         else:
-            self.__panelRight.move(deltaT * -self.speed, 0)
-            if self.__panelRight.getAnchor().x < 322:
-                self.open = True
-        pass
+            if self.__panelRight.getAnchor().x > self.__anchorRight:
+                self.__panelRight.move(deltaT * -self.__doorSpeed, 0)
+            if self.__panelLeft.getAnchor().x < self.__anchorLeft:
+                self.__panelLeft.move(deltaT * self.__doorSpeed, 0)
+    def open(self):
+        self.__isOpen = not self.__isOpen
+    def checkPlayer(self):
+        if (pointCircle(self.__playerX,self.__playerY,self.__posX + 32,self.__posY+32,69)):
+            self.__isOpen = True
+    def setPlayerCoords(self,playerX,playerY):
+        self.__playerX =playerX
+        self.__playerY = playerY
