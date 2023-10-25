@@ -1,4 +1,5 @@
 from math import sqrt
+# 
 def circleRect(cx,cy,r,rx,ry,rw,rh):
     testX = cx
     testY = cy
@@ -35,7 +36,7 @@ def lineLine(x1,y1,x2,y2,x3,y3,x4,y4):
 
     else: return False
 
-def circleRectMove(cx,potentialPosition:list[float],tileX,tileY):
+def circleRectMove(cx, potentialPosition,tileX,tileY):
     nearestPoint = [0,0]
     nearestPoint[0] = max(float(tileX), min(potentialPosition[0], float(tileX+32)))
     nearestPoint[1] = max(float(tileY), min(potentialPosition[1], float(tileY+32)))
@@ -51,3 +52,12 @@ def circleRectMove(cx,potentialPosition:list[float],tileX,tileY):
         potentialPosition[1] = potentialPosition[1] - (rayToNearest[1]/rayMag) * overlap
 
     return potentialPosition
+
+def pointCircle(pointX, pointY, circleX, circleY, r):
+  distX = pointX - circleX
+  distY = pointY - circleY
+  distanceSqrd = (distX*distX) + (distY*distY)
+
+  return (distanceSqrd <= (r*r))
+
+

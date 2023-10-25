@@ -2,14 +2,17 @@ import math
 
 from graphics import *
 from math import sqrt
+from time import *
 class Monster():
     def __init__(self):
-        self.__movementSpeed = 50
+        self.__movementSpeed = 75
         self.__hasLineOfSight = True
         self.__currentTargetX = 0
         self.__currentTargetY = 0
         self.__playerDir = [0.0, 0.0]
         self.playerDistance = 0.0
+        self.height = 25
+        self.width = 25
 
         self.__path = []
         self.__currentPathTarget = [100, 100]
@@ -39,10 +42,49 @@ class Monster():
         if (isHit):
             self.__img.undraw()
             self.__altImg.draw(self.__gw)
+            # commented out game over screen because it is annoying when looking for coords and stuff xd
+            self.game_over_screen()
+
         else:
             self.__altImg.undraw()
             self.__img.draw(self.__gw)
 
+    def game_over_screen(self):
+        pass
+        '''
+        # unfinished death message
+        deathMessage = Text(Point(480, 325), 'YOU DIED')
+        deathMessage.setSize(20)
+        deathMessage.setTextColor('white')
+        deathMessage.draw(self.__gw)
+        
+        deathMessage.undraw()
+        '''
+        overlay = Rectangle(Point(0, 0), Point(961, 705))
+        overlay.setFill('black')
+        overlay.setOutline('black')
+        overlay.draw(self.__gw)
+
+        restart_button = Rectangle(Point(353, 300), Point(607, 350))
+        restart_button.setFill('white')
+        restartLabel = Text(Point(480, 325), 'RESTART')
+        restartLabel.setSize(20)
+        restartLabel.setTextColor('black')
+        restartLabel.setStyle('bold italic')
+        restart_button.draw(self.__gw)
+        restartLabel.draw(self.__gw)
+
+        game_over_text = Text(Point(480, 100), 'Game Over')
+        game_over_text.setSize(28)
+        game_over_text.setTextColor('red')
+        game_over_text.setStyle('bold italic')
+        game_over_text.draw(self.__gw)
+
+        self.__gw.getMouse()
+        game_over_text.undraw()
+        overlay.undraw()
+
+        
 
     def setTargetPos(self, x, y):
         self.__currentTargetX = x

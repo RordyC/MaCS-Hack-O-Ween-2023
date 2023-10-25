@@ -6,22 +6,25 @@ import random
 import graphics
 from Monster import *
 from Player import Player
+from Door import Door
 from InputHandler import *
 from graphics import *
 from time import *
 from tilebase import *
 from queue import PriorityQueue
 from Collisions import *
+from WorldSprite import WorldSprite
 import pickle
+#from Doors import Door
 
 width = 705 + 256
 height = 705
 
-gw = GraphWin("GAME", width, height,autoflush=False) #This is the window where all the grapics are drawn.
+gw = GraphWin("GAME", width, height,autoflush=False) #This is the window where all the graphics are drawn.
 gw.setBackground("black")
 
-inputHandler = InputHandler() #Object that recieves input from the window.
-gw.setInputHandler(inputHandler)  # We pass in the input handler to the window so it can recieve input!
+inputHandler = InputHandler() #Object that receives input from the window.
+gw.setInputHandler(inputHandler)  # We pass in the input handler to the window, so it can receive input!
 
 player = Player(Point(width/2,height/2),inputHandler) #Player object that is controller by user.
 monster = Monster() #Monster object that chases the player around the map.
@@ -39,37 +42,104 @@ rayTxt.setTextColor("lightgreen")
 gridIndexTxt.setTextColor("orange")
 mousePosTxt.setTextColor("cyan")
 
+testDoor = Door((64 * 5) + 2,64,0)
 
 runtimeTxt = Text(Point(400, 25), "")
 fpsTxt = Text(Point(400, 50), "")
+debugView = False
+editView = False
 
 deltaT = -1.0
-gridSizeX = 22
-gridSizeY = 22
+gridSizeX = 32
+gridSizeY = 32
 gridCellSize = 32
 grid = []
 endTile: TileBase = None
 startTile: TileBase = None
 nearTiles = []
 
-def main():
-    menu() #Calling this opens main menu.
-    game() #Calling this starts the game loop.
 
+
+def main():
+    menu() #Calling this opens main menu
+    game() #Calling this starts the game loop.
 def menu():
-    pass
+    # all background info
+    white_background = Rectangle(Point(0, 0), Point(961, 705))
+    white_background.setFill('white')
+    white_background.draw(gw)
+    menuBackground = Image(Point(480, 352), 'blood.png')
+
+    # Title 
+    titleLabel = Text(Point(480, 100), 'THE GAME')
+    titleLabel.setSize(28)
+    titleLabel.setTextColor('black')
+    titleLabel.setStyle('bold italic')
+
+    # Start button
+    startLabel = Text(Point(480, 325), 'Start Game')
+    startLabel.setSize(20)
+    startLabel.setTextColor('white')
+    startLabel.setStyle('bold italic')
+
+    startButton = Rectangle(Point(353, 300), Point(607, 350))
+    startButton.setFill('lightgreen')
+
+    # Quit button
+    quitLabel = Text(Point( 480, 425), 'Exit To Desktop')
+    quitLabel.setSize(20)
+    quitLabel.setTextColor('white')
+    quitLabel.setStyle('bold italic')
+
+    quitButton = Rectangle(Point(353, 400), Point(607, 450))
+    quitButton.setFill('brown')
+    
+    # Draws Menu
+    menuBackground.draw(gw)
+    titleLabel.draw(gw)
+    startButton.draw(gw)
+    startLabel.draw(gw)
+    quitButton.draw(gw)
+    quitLabel.draw(gw)
+    while True:
+            click_point = gw.checkMouse()
+            if click_point:
+                if 353 < click_point.getX() < 607:
+                    if 300 < click_point.getY() < 350:
+                        break
+                    elif 400 < click_point.getY() < 450:
+                        gw.close()
+    # Undraws menu and pauses for (1) second 
+    for item in gw.items[:]:
+        item.undraw()
+    gw.update()                    
+    sleep(1)               
 
 def game():
-
+    collision_raidus = 25
     global gw
     global deltaT
     makeGrid()
+    game_over = False
+
     #gw.setCoords(0+ 500,705,705 + 500,0)
     walls = []
     floors = []
 
-    door = Image(Point((64 * 5) + 2,64), "sprites/door.png")
-    door.draw(gw)
+    # key drawingsdda
+    keys = []
+    
+    key1 = Circle(Point(690, 85), 10)
+    key1.setFill('red')
+    #key2 = Circle(Point(200, 200), 10)
+    #key2.setFill('green')
+    key3 = Circle(Point(505, 636), 10)
+    key3.setFill('blue')
+    keys.extend([key1, key3])
+    keys_data = [{'color':'red','circle':key1, 'collected':False},
+                {'color':'blue','circle':key3, 'collected':False}]
+    for key in keys:
+        key.draw(gw)  
 
     for row in range(len(grid)):
         for col in range(len(grid[row])):
@@ -83,7 +153,7 @@ def game():
         wall.draw(gw)
         walls.append(wall)
 
-
+    testDoor.draw(gw)
     mousePosTxt.draw(gw)
     fpsTxt.setTextColor("yellow")
 
@@ -95,38 +165,50 @@ def game():
 
     monster.draw(gw)
     player.draw(gw)
+    sprite = WorldSprite(500,500,"wall",gw)
+    sprite.draw()
+    testDoor.setTiles([grid[1][10],grid[1][9],grid[2][10],grid[2][9]])
 
     print(len(grid))
 
-    done = False
-    while not done:  # This will run until 'done' is False.
+    game_over = False
+    while not game_over:  # This will run until 'done' is False.
+
         currentTime = time.time()
 
         monster.setTargetPos(player.getPos().x,player.getPos().y)
         monster.update(deltaT)
         player.update(deltaT)
         player.setCollisionTiles(nearTiles)
+        testDoor.update(deltaT)
+        testDoor.setPlayerCoords(player.getPos().x,player.getPos().y)
         updateEndPos()
 
         gridEditing()
 
         global sightLine
+        global debugView
         sightLine.undraw()
-        sightLine = Line(player.getPos(),monster.getPos())
+        if (debugView):
+            sightLine = Line(player.getPos(), monster.getPos())
+            sightLine.draw(gw)
+
         if (checkLineOfSight(monster.getPos().x,monster.getPos().y,monster.getPlayerDir(),monster.getPlayerDist())):
             sightLine.setFill("red")
             monster.updateLineOfSight(False)
         else:
             sightLine.setFill("cyan")
             monster.updateLineOfSight(True)
-        sightLine.draw(gw)
+
 
         if gw.checkKey() == 'v':
+            toggleDebugView()
             print("Showing grid: ")
-
             for row in grid:
                 for tile in row:
                     tile.toggleDebug(True)
+        if gw.checkKey() == 'i':
+            saveWorld()
 
         sx = monster.getPos().x - 57/2
         sy = monster.getPos().y - 57/2
@@ -140,18 +222,38 @@ def game():
 
         time.sleep((0.1/1000))   #Calling this redraws everything on screen.
         gw.update()
-
+        
         deltaT = time.time() - currentTime
+        for key_data in keys_data:
+            # logic to check if keys are collected, undrawing them as well
+            if not key_data['collected']:
+                key_circle = key_data["circle"]
+                key_color = key_data['color']
+                if circleRect(player.getPos().x, player.getPos().y, 16, key_circle.getCenter().x, key_circle.getCenter().y, 10, 10):
+                    key_color = key_data['color']
+                    key_circle.undraw()  
+                    player.collect_keys(key_color)  
+                    key_data['collected'] = True  
+
+                
+        
         if (gw.closed): #When the window is closed the gameloop finishes
             done = True
+            
+
 def makeGrid():
     rows = gridSizeX
     columns = gridSizeY
     count = 0
+    with open('grid_data','rb') as f:
+        gridData = pickle.load(f)
     for row in range(rows):
         row_list = []
         for col in range(columns):
             tile = TileBase(row,col,gridCellSize,rows)
+            if (row < len(gridData)):
+                if col < len(gridData[row]):
+                    tile.updateState(gridData[row][col])
             row_list.append(tile)
             count +=1
         grid.append(row_list)
@@ -159,7 +261,6 @@ def makeGrid():
     global endTile
     endTile = grid[1][1]
     print(f'Grid Size: {count}')
-
 
 def gridEditing():
     col = inputHandler.getMousePos()[0] // gridCellSize
@@ -171,45 +272,44 @@ def gridEditing():
         row = 0
     gridIndexTxt.setText(f"Grid Index: [{row}][{col}]")
     selectedTile: TileBase = grid[row][col]
-    if (inputHandler.getMousePressed()):
+    if (inputHandler.getMousePressed() and debugView):
         if (selectedTile.getState() == 0 or selectedTile.getState() == 5):
             selectedTile.updateState(1)
             # Grid updated
             for row in grid:
                 for tile in row:
                     tile.updateNeighbors(grid)
-    if (inputHandler.getRMB()):
+    if (inputHandler.getRMB()and debugView):
         if (selectedTile.getState() == 1):
             selectedTile.updateState(0)
             # Grid updated
             for row in grid:
                 for tile in row:
                     tile.updateNeighbors(grid)
+                    
 def updatePlayerCollision(row:int,col:int):
     global nearTiles
     nearTiles = []
 
     for r in range(0,4):
         for c in range(0,4):
-            try:
-                tile = grid[col - 2 + c][row - 2 + r]
-                if (tile.getState() == 1):
-                    nearTiles.append(tile)
-            except:
-                pass
-    print(f"nuts: {len(nearTiles)}")
+            rt = max(min(row - 2 + r,gridSizeY -1), 0)
+            ct = max(min(col - 2 + c,gridSizeX -1), 0)
+            tile = grid[rt][ct]
+            if (tile.getState() == 1):
+                nearTiles.append(tile)
 def updateEndPos():
     global startTile
     global endTile
-    targetRow = int(player.getPos().x // gridCellSize)
-    targetCol = int(player.getPos().y // gridCellSize)
+    targetRow = int(player.getPos().y // gridCellSize)
+    targetCol = int(player.getPos().x // gridCellSize)
 
 
     startRow = int((monster.getPos().y - gridCellSize/2) // gridCellSize)
     startCol = int((monster.getPos().x - gridCellSize/2) // gridCellSize)
 
     currentStart = grid[startRow][startCol]
-    currentTarget = grid[targetCol][targetRow]
+    currentTarget = grid[targetRow][targetCol]
     updatePlayerCollision(targetRow, targetCol)
     if (currentTarget.getState() == 1):
         return
@@ -231,7 +331,7 @@ def updateEndPos():
 def heuristic(start:Point,end:Point):
     return (abs(end[0] - start[0]) + abs(end[1]-start[1]))
 
-def checkLineOfSight(startX,startY,rayDirection:list[float],distance:float):
+def checkLineOfSight(startX,startY,rayDirection:[float],distance):
     rayStart = [startX,startY]
     rayDir = rayDirection
 
@@ -347,5 +447,25 @@ def pathfind(grid,start:TileBase,end:TileBase):
         if current != start:
             current.updateState(2)
     return False
+def saveWorld():
+    print("Saving...")
+    gridData = []
+    for row in grid:
+        rowData = []
+        for col in row:
+            if (col.getState() == 1):
+                rowData.append(1)
+            else:
+                rowData.append(0)
+        gridData.append(rowData)
+    print(gridData)
 
+    with open('grid_data', 'wb') as f:
+        pickle.dump(gridData, f)
+def toggleDebugView():
+    global debugView
+    if (debugView):
+        debugView = False
+    else:
+        debugView = True
 main()

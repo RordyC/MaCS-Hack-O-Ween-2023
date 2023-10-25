@@ -1,5 +1,7 @@
 import graphics
 from graphics import *
+from tilebase import *
+
 
 
 class TileBase:
@@ -40,12 +42,13 @@ class TileBase:
     def draw(self, win):
         self.rect.draw(win)
         self.win = win
-
+        self.isDrawn = True
         self.__updateVisuals()
 
     def updateState(self, newState: int):
         self.state = newState
-        self.__updateVisuals()
+        if not (self.win == None):
+            self.__updateVisuals()
 
     def __updateVisuals(self):
         if self.showDebug:
@@ -117,7 +120,7 @@ class TileBase:
     def getState(self) -> int:
         return self.state
 
-    def getEdges(self) -> list[bool]:
+    def getEdges(self) -> [bool, bool, bool, bool]:
         return self.edges
 
     def setHCostText(self, score):
