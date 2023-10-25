@@ -50,6 +50,7 @@ class Monster():
             self.__img.draw(self.__gw)
 
     def game_over_screen(self):
+        pass
         '''
         # unfinished death message
         deathMessage = Text(Point(480, 325), 'YOU DIED')
