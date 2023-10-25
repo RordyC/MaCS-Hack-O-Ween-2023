@@ -43,7 +43,7 @@ class Monster():
             self.__img.undraw()
             self.__altImg.draw(self.__gw)
             # commented out game over screen because it is annoying when looking for coords and stuff xd
-            # self.game_over_screen()
+            self.game_over_screen()
 
         else:
             self.__altImg.undraw()
