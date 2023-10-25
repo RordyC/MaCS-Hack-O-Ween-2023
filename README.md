@@ -17,3 +17,5 @@ This project was created in Python using only the grapics.py library created by 
 📈: [DDA Raycasting](https://til.zimventures.com/GameMaker/dda)
 
 ♟️: [A* Pathfinding](https://www.youtube.com/watch?v=-L-WgKMFuhE)
+
+ Art: [Warped Lab](https://opengameart.org/content/warped-top-down-tech-lab)  

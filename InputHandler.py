@@ -13,18 +13,19 @@ class InputHandler(object):
         self.__dKey = False
 
         self.__vKey = False
+        self.__equalKey = False
 
     def lmbReleased(self):
         self.__lmb = False
 
     def lmbPressed(self):
         self.__lmb = True
-
     def rmbReleased(self):
         self.__rmb = False
 
     def rmbPressed(self):
         self.__rmb = True
+
 
     def keyPressed(self, evnt):
         evnt = evnt.lower()
@@ -41,6 +42,8 @@ class InputHandler(object):
                 self.__dKey = True
             if (evnt == 'v'):
                 self.__vKey = True
+            if (evnt == '='):
+                self.__equalKey = True
 
     def keyReleased(self, evnt):
         evnt = evnt.lower()
@@ -58,6 +61,8 @@ class InputHandler(object):
             self.__dKey = False
         if (evnt == 'v'):
             self.__vKey = False
+        if (evnt == '='):
+            self.__equalKey = True
 
     def getYAxis(self) -> int:
         if (self.__wKey and self.__sKey):

@@ -52,3 +52,12 @@ def circleRectMove(cx, potentialPosition,tileX,tileY):
         potentialPosition[1] = potentialPosition[1] - (rayToNearest[1]/rayMag) * overlap
 
     return potentialPosition
+
+def pointCircle(pointX, pointY, circleX, circleY, r):
+  distX = pointX - circleX
+  distY = pointY - circleY
+  distanceSqrd = (distX*distX) + (distY*distY)
+
+  return (distanceSqrd <= (r*r))
+
+
