@@ -6,22 +6,24 @@ import random
 import graphics
 from Monster import *
 from Player import Player
+from Door import Door
 from InputHandler import *
 from graphics import *
 from time import *
 from tilebase import *
 from queue import PriorityQueue
 from Collisions import *
+from WorldSprite import WorldSprite
 import pickle
 
 width = 705 + 256
 height = 705
 
-gw = GraphWin("GAME", width, height,autoflush=False) #This is the window where all the grapics are drawn.
+gw = GraphWin("GAME", width, height,autoflush=False) #This is the window where all the graphics are drawn.
 gw.setBackground("black")
 
-inputHandler = InputHandler() #Object that recieves input from the window.
-gw.setInputHandler(inputHandler)  # We pass in the input handler to the window so it can recieve input!
+inputHandler = InputHandler() #Object that receives input from the window.
+gw.setInputHandler(inputHandler)  # We pass in the input handler to the window, so it can receive input!
 
 player = Player(Point(width/2,height/2),inputHandler) #Player object that is controller by user.
 monster = Monster() #Monster object that chases the player around the map.
@@ -39,13 +41,16 @@ rayTxt.setTextColor("lightgreen")
 gridIndexTxt.setTextColor("orange")
 mousePosTxt.setTextColor("cyan")
 
+testDoor = Door((64 * 5) + 2,64,0)
 
 runtimeTxt = Text(Point(400, 25), "")
 fpsTxt = Text(Point(400, 50), "")
+debugView = False
+editView = False
 
 deltaT = -1.0
-gridSizeX = 22
-gridSizeY = 22
+gridSizeX = 32
+gridSizeY = 32
 gridCellSize = 32
 grid = []
 endTile: TileBase = None
@@ -67,10 +72,6 @@ def game():
     #gw.setCoords(0+ 500,705,705 + 500,0)
     walls = []
     floors = []
-
-    door = Image(Point((64 * 5) + 2,64), "sprites/door.png")
-    door.draw(gw)
-
     for row in range(len(grid)):
         for col in range(len(grid[row])):
             grid[row][col].draw(gw)
@@ -83,7 +84,7 @@ def game():
         wall.draw(gw)
         walls.append(wall)
 
-
+    testDoor.draw(gw)
     mousePosTxt.draw(gw)
     fpsTxt.setTextColor("yellow")
 
@@ -95,6 +96,9 @@ def game():
 
     monster.draw(gw)
     player.draw(gw)
+    sprite = WorldSprite(500,500,"wall",gw)
+    sprite.draw()
+    testDoor.setTiles([grid[1][10],grid[1][9],grid[2][10],grid[2][9]])
 
     print(len(grid))
 
@@ -106,27 +110,35 @@ def game():
         monster.update(deltaT)
         player.update(deltaT)
         player.setCollisionTiles(nearTiles)
+        testDoor.update(deltaT)
+        testDoor.setPlayerCoords(player.getPos().x,player.getPos().y)
         updateEndPos()
 
         gridEditing()
 
         global sightLine
+        global debugView
         sightLine.undraw()
-        sightLine = Line(player.getPos(),monster.getPos())
+        if (debugView):
+            sightLine = Line(player.getPos(), monster.getPos())
+            sightLine.draw(gw)
+
         if (checkLineOfSight(monster.getPos().x,monster.getPos().y,monster.getPlayerDir(),monster.getPlayerDist())):
             sightLine.setFill("red")
             monster.updateLineOfSight(False)
         else:
             sightLine.setFill("cyan")
             monster.updateLineOfSight(True)
-        sightLine.draw(gw)
+
 
         if gw.checkKey() == 'v':
+            toggleDebugView()
             print("Showing grid: ")
-
             for row in grid:
                 for tile in row:
                     tile.toggleDebug(True)
+        if gw.checkKey() == 'i':
+            saveWorld()
 
         sx = monster.getPos().x - 57/2
         sy = monster.getPos().y - 57/2
@@ -148,10 +160,15 @@ def makeGrid():
     rows = gridSizeX
     columns = gridSizeY
     count = 0
+    with open('grid_data','rb') as f:
+        gridData = pickle.load(f)
     for row in range(rows):
         row_list = []
         for col in range(columns):
             tile = TileBase(row,col,gridCellSize,rows)
+            if (row < len(gridData)):
+                if col < len(gridData[row]):
+                    tile.updateState(gridData[row][col])
             row_list.append(tile)
             count +=1
         grid.append(row_list)
@@ -159,7 +176,6 @@ def makeGrid():
     global endTile
     endTile = grid[1][1]
     print(f'Grid Size: {count}')
-
 
 def gridEditing():
     col = inputHandler.getMousePos()[0] // gridCellSize
@@ -171,14 +187,14 @@ def gridEditing():
         row = 0
     gridIndexTxt.setText(f"Grid Index: [{row}][{col}]")
     selectedTile: TileBase = grid[row][col]
-    if (inputHandler.getMousePressed()):
+    if (inputHandler.getMousePressed() and debugView):
         if (selectedTile.getState() == 0 or selectedTile.getState() == 5):
             selectedTile.updateState(1)
             # Grid updated
             for row in grid:
                 for tile in row:
                     tile.updateNeighbors(grid)
-    if (inputHandler.getRMB()):
+    if (inputHandler.getRMB()and debugView):
         if (selectedTile.getState() == 1):
             selectedTile.updateState(0)
             # Grid updated
@@ -191,25 +207,23 @@ def updatePlayerCollision(row:int,col:int):
 
     for r in range(0,4):
         for c in range(0,4):
-            try:
-                tile = grid[col - 2 + c][row - 2 + r]
-                if (tile.getState() == 1):
-                    nearTiles.append(tile)
-            except:
-                pass
-    print(f"nuts: {len(nearTiles)}")
+            rt = max(min(row - 2 + r,gridSizeY -1), 0)
+            ct = max(min(col - 2 + c,gridSizeX -1), 0)
+            tile = grid[rt][ct]
+            if (tile.getState() == 1):
+                nearTiles.append(tile)
 def updateEndPos():
     global startTile
     global endTile
-    targetRow = int(player.getPos().x // gridCellSize)
-    targetCol = int(player.getPos().y // gridCellSize)
+    targetRow = int(player.getPos().y // gridCellSize)
+    targetCol = int(player.getPos().x // gridCellSize)
 
 
     startRow = int((monster.getPos().y - gridCellSize/2) // gridCellSize)
     startCol = int((monster.getPos().x - gridCellSize/2) // gridCellSize)
 
     currentStart = grid[startRow][startCol]
-    currentTarget = grid[targetCol][targetRow]
+    currentTarget = grid[targetRow][targetCol]
     updatePlayerCollision(targetRow, targetCol)
     if (currentTarget.getState() == 1):
         return
@@ -347,5 +361,25 @@ def pathfind(grid,start:TileBase,end:TileBase):
         if current != start:
             current.updateState(2)
     return False
+def saveWorld():
+    print("Saving...")
+    gridData = []
+    for row in grid:
+        rowData = []
+        for col in row:
+            if (col.getState() == 1):
+                rowData.append(1)
+            else:
+                rowData.append(0)
+        gridData.append(rowData)
+    print(gridData)
 
+    with open('grid_data', 'wb') as f:
+        pickle.dump(gridData, f)
+def toggleDebugView():
+    global debugView
+    if (debugView):
+        debugView = False
+    else:
+        debugView = True
 main()

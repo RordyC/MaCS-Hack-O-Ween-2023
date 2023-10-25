@@ -27,7 +27,6 @@ class Player():
         self.__vx = self.__inputHandler.getXAxis() * self.__speed * deltaTime
         self.__vy = self.__inputHandler.getYAxis() * self.__speed * deltaTime
         potentialPosition = [currentX + self.__vx, currentY + self.__vy]
-        potentialPosition = circleRectMove(16, potentialPosition, 10 * 32, 4 * 32)
 
         if (len(self.__ct) > 0):
          for t in self.__ct:
