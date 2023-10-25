@@ -20,12 +20,12 @@ class InputHandler(object):
 
     def lmbPressed(self):
         self.__lmb = True
-
     def rmbReleased(self):
         self.__rmb = False
 
     def rmbPressed(self):
         self.__rmb = True
+
 
     def keyPressed(self, evnt):
         evnt = evnt.lower()

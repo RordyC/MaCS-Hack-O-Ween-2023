@@ -45,10 +45,12 @@ testDoor = Door((64 * 5) + 2,64,0)
 
 runtimeTxt = Text(Point(400, 25), "")
 fpsTxt = Text(Point(400, 50), "")
+debugView = False
+editView = False
 
 deltaT = -1.0
-gridSizeX = 22
-gridSizeY = 22
+gridSizeX = 32
+gridSizeY = 32
 gridCellSize = 32
 grid = []
 endTile: TileBase = None
@@ -115,17 +117,22 @@ def game():
         gridEditing()
 
         global sightLine
+        global debugView
         sightLine.undraw()
-        sightLine = Line(player.getPos(),monster.getPos())
+        if (debugView):
+            sightLine = Line(player.getPos(), monster.getPos())
+            sightLine.draw(gw)
+
         if (checkLineOfSight(monster.getPos().x,monster.getPos().y,monster.getPlayerDir(),monster.getPlayerDist())):
             sightLine.setFill("red")
             monster.updateLineOfSight(False)
         else:
             sightLine.setFill("cyan")
             monster.updateLineOfSight(True)
-        sightLine.draw(gw)
+
 
         if gw.checkKey() == 'v':
+            toggleDebugView()
             print("Showing grid: ")
             for row in grid:
                 for tile in row:
@@ -159,7 +166,9 @@ def makeGrid():
         row_list = []
         for col in range(columns):
             tile = TileBase(row,col,gridCellSize,rows)
-            tile.updateState(gridData[row][col])
+            if (row < len(gridData)):
+                if col < len(gridData[row]):
+                    tile.updateState(gridData[row][col])
             row_list.append(tile)
             count +=1
         grid.append(row_list)
@@ -178,14 +187,14 @@ def gridEditing():
         row = 0
     gridIndexTxt.setText(f"Grid Index: [{row}][{col}]")
     selectedTile: TileBase = grid[row][col]
-    if (inputHandler.getMousePressed()):
+    if (inputHandler.getMousePressed() and debugView):
         if (selectedTile.getState() == 0 or selectedTile.getState() == 5):
             selectedTile.updateState(1)
             # Grid updated
             for row in grid:
                 for tile in row:
                     tile.updateNeighbors(grid)
-    if (inputHandler.getRMB()):
+    if (inputHandler.getRMB()and debugView):
         if (selectedTile.getState() == 1):
             selectedTile.updateState(0)
             # Grid updated
@@ -367,4 +376,10 @@ def saveWorld():
 
     with open('grid_data', 'wb') as f:
         pickle.dump(gridData, f)
+def toggleDebugView():
+    global debugView
+    if (debugView):
+        debugView = False
+    else:
+        debugView = True
 main()
