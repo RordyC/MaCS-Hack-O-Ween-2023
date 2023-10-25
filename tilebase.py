@@ -1,5 +1,7 @@
 import graphics
 from graphics import *
+from tilebase import *
+
 
 
 class TileBase:
@@ -118,7 +120,7 @@ class TileBase:
     def getState(self) -> int:
         return self.state
 
-    def getEdges(self) -> list[bool]:
+    def getEdges(self) -> [bool, bool, bool, bool]:
         return self.edges
 
     def setHCostText(self, score):

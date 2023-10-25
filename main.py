@@ -15,6 +15,7 @@ from queue import PriorityQueue
 from Collisions import *
 from WorldSprite import WorldSprite
 import pickle
+#from Doors import Door
 
 width = 705 + 256
 height = 705
@@ -57,21 +58,89 @@ endTile: TileBase = None
 startTile: TileBase = None
 nearTiles = []
 
-def main():
-    menu() #Calling this opens main menu.
-    game() #Calling this starts the game loop.
 
+
+def main():
+    menu() #Calling this opens main menu
+    game() #Calling this starts the game loop.
 def menu():
-    pass
+    # all background info
+    white_background = Rectangle(Point(0, 0), Point(961, 705))
+    white_background.setFill('white')
+    white_background.draw(gw)
+    menuBackground = Image(Point(480, 352), 'blood.png')
+
+    # Title 
+    titleLabel = Text(Point(480, 100), 'THE GAME')
+    titleLabel.setSize(28)
+    titleLabel.setTextColor('black')
+    titleLabel.setStyle('bold italic')
+
+    # Start button
+    startLabel = Text(Point(480, 325), 'Start Game')
+    startLabel.setSize(20)
+    startLabel.setTextColor('white')
+    startLabel.setStyle('bold italic')
+
+    startButton = Rectangle(Point(353, 300), Point(607, 350))
+    startButton.setFill('lightgreen')
+
+    # Quit button
+    quitLabel = Text(Point( 480, 425), 'Exit To Desktop')
+    quitLabel.setSize(20)
+    quitLabel.setTextColor('white')
+    quitLabel.setStyle('bold italic')
+
+    quitButton = Rectangle(Point(353, 400), Point(607, 450))
+    quitButton.setFill('brown')
+    
+    # Draws Menu
+    menuBackground.draw(gw)
+    titleLabel.draw(gw)
+    startButton.draw(gw)
+    startLabel.draw(gw)
+    quitButton.draw(gw)
+    quitLabel.draw(gw)
+    while True:
+            click_point = gw.checkMouse()
+            if click_point:
+                if 353 < click_point.getX() < 607:
+                    if 300 < click_point.getY() < 350:
+                        break
+                    elif 400 < click_point.getY() < 450:
+                        gw.close()
+    # Undraws menu and pauses for (1) second 
+    for item in gw.items[:]:
+        item.undraw()
+    gw.update()                    
+    sleep(1)               
 
 def game():
-
+    collision_raidus = 25
     global gw
     global deltaT
     makeGrid()
+    game_over = False
+
     #gw.setCoords(0+ 500,705,705 + 500,0)
     walls = []
     floors = []
+
+    # key drawingsdda
+    keys = []
+    
+    key1 = Circle(Point(690, 85), 10)
+    key1.setFill('red')
+    #key2 = Circle(Point(200, 200), 10)
+    #key2.setFill('green')
+    key3 = Circle(Point(505, 636), 10)
+    key3.setFill('blue')
+    keys.extend([key1, key3])
+    keys_data = [{'color':'red','circle':key1, 'collected':False},
+                {'color':'blue','circle':key3, 'collected':False}]
+    for key in keys:
+        key.draw(gw)  
+
     for row in range(len(grid)):
         for col in range(len(grid[row])):
             grid[row][col].draw(gw)
@@ -102,8 +171,9 @@ def game():
 
     print(len(grid))
 
-    done = False
-    while not done:  # This will run until 'done' is False.
+    game_over = False
+    while not game_over:  # This will run until 'done' is False.
+
         currentTime = time.time()
 
         monster.setTargetPos(player.getPos().x,player.getPos().y)
@@ -152,10 +222,25 @@ def game():
 
         time.sleep((0.1/1000))   #Calling this redraws everything on screen.
         gw.update()
-
+        
         deltaT = time.time() - currentTime
+        for key_data in keys_data:
+            # logic to check if keys are collected, undrawing them as well
+            if not key_data['collected']:
+                key_circle = key_data["circle"]
+                key_color = key_data['color']
+                if circleRect(player.getPos().x, player.getPos().y, 16, key_circle.getCenter().x, key_circle.getCenter().y, 10, 10):
+                    key_color = key_data['color']
+                    key_circle.undraw()  
+                    player.collect_keys(key_color)  
+                    key_data['collected'] = True  
+
+                
+        
         if (gw.closed): #When the window is closed the gameloop finishes
             done = True
+            
+
 def makeGrid():
     rows = gridSizeX
     columns = gridSizeY
@@ -201,6 +286,7 @@ def gridEditing():
             for row in grid:
                 for tile in row:
                     tile.updateNeighbors(grid)
+                    
 def updatePlayerCollision(row:int,col:int):
     global nearTiles
     nearTiles = []
@@ -245,7 +331,7 @@ def updateEndPos():
 def heuristic(start:Point,end:Point):
     return (abs(end[0] - start[0]) + abs(end[1]-start[1]))
 
-def checkLineOfSight(startX,startY,rayDirection:list[float],distance:float):
+def checkLineOfSight(startX,startY,rayDirection:[float],distance):
     rayStart = [startX,startY]
     rayDir = rayDirection
 
