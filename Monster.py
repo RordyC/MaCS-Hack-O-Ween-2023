@@ -5,7 +5,7 @@ from math import sqrt
 from time import *
 class Monster():
     def __init__(self):
-        self.__movementSpeed = 75
+        self.__movementSpeed = 100
         self.__hasLineOfSight = True
         self.__currentTargetX = 0
         self.__currentTargetY = 0
@@ -50,7 +50,7 @@ class Monster():
             self.__img.draw(self.__gw)
 
     def game_over_screen(self):
-        pass
+        return
         '''
         # unfinished death message
         deathMessage = Text(Point(480, 325), 'YOU DIED')
