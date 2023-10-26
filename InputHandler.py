@@ -44,6 +44,8 @@ class InputHandler(object):
                 self.__vKey = True
             if (evnt == '='):
                 self.__equalKey = True
+            if (evnt == 'b'):
+                self.__bKey = True
 
     def keyReleased(self, evnt):
         evnt = evnt.lower()
@@ -63,6 +65,8 @@ class InputHandler(object):
             self.__vKey = False
         if (evnt == '='):
             self.__equalKey = True
+        if (evnt == 'b'):
+            self.__bKey = True
 
     def getYAxis(self) -> int:
         if (self.__wKey and self.__sKey):

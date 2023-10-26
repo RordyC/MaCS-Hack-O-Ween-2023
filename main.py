@@ -123,8 +123,6 @@ def game():
     game_over = False
 
     #gw.setCoords(0+ 500,705,705 + 500,0)
-    walls = []
-    floors = []
 
     # key drawingsdda
     keys = []
@@ -144,14 +142,6 @@ def game():
     for row in range(len(grid)):
         for col in range(len(grid[row])):
             grid[row][col].draw(gw)
-    for i in range(5):
-        wall = Image(Point(64 * i, 64), "sprites/wall.png")
-        wall.draw(gw)
-        walls.append(wall)
-    for i in range(5):
-        wall = Image(Point(64 * i, 128), "sprites/floor.png")
-        wall.draw(gw)
-        walls.append(wall)
 
     testDoor.draw(gw)
     mousePosTxt.draw(gw)
@@ -165,12 +155,22 @@ def game():
 
     monster.draw(gw)
     player.draw(gw)
-    sprite = WorldSprite(500,500,"wall",gw)
-    sprite.draw()
+
+    sprites = []
+
+    sprite1 = WorldSprite(500,500,"wall",gw)
+    sprite2 = WorldSprite(564,500,"wall",gw)
+    sprite3 = WorldSprite(564,500,"floor",gw)
+    sprites.append(sprite1)
+    sprites.append(sprite2)
+    sprites.append(sprite3)
+    for sprite in sprites:
+        sprite.draw()
+
     testDoor.setTiles([grid[1][10],grid[1][9],grid[2][10],grid[2][9]])
 
     print(len(grid))
-
+    selectedSprite = None
     game_over = False
     while not game_over:  # This will run until 'done' is False.
 
@@ -200,7 +200,8 @@ def game():
             sightLine.setFill("cyan")
             monster.updateLineOfSight(True)
 
-
+        if gw.checkKey() == 'b':
+            toggleWorldEdit()
         if gw.checkKey() == 'v':
             toggleDebugView()
             print("Showing grid: ")
@@ -209,6 +210,28 @@ def game():
                     tile.toggleDebug(True)
         if gw.checkKey() == 'i':
             saveWorld()
+
+        if (inputHandler.getMousePressed() and editView and selectedSprite == None):
+            print("!")
+            closestSprite = None
+            closestDist = math.inf
+
+            for sprite in sprites:
+                print("b")
+                currentDist = (inputHandler.getMousePos()[0] -sprite.getGrabPointPos().x) + (inputHandler.getMousePos()[1]-sprite.getGrabPointPos().y)
+                if (abs(currentDist) < closestDist):
+                    closestDist = currentDist
+                    closestSprite = sprite
+
+            selectedSprite = closestSprite
+        elif (selectedSprite != None):
+            selectedSprite.setPos(inputHandler.getMousePos()[0]//gridSizeX *gridCellSize,inputHandler.getMousePos()[1]//gridSizeY * gridCellSize)
+
+        if (inputHandler.getMousePressed() == False and selectedSprite != None):
+            print(":(")
+            selectedSprite = None
+
+
 
         sx = monster.getPos().x - 57/2
         sy = monster.getPos().y - 57/2
@@ -468,4 +491,10 @@ def toggleDebugView():
         debugView = False
     else:
         debugView = True
+def toggleWorldEdit():
+    global editView
+    if (editView):
+        editView = False
+    else:
+        editView = True
 main()
