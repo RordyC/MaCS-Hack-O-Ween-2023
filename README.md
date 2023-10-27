@@ -5,9 +5,9 @@ This project was created in Python using only the grapics.py library created by 
 
  # Features
  
-- [A* Pathfinding](#installation)
-- [DDA Tile Raycasting](#usage)
-- [Contributing](#contributing)
+- [A* Pathfinding]
+- [DDA Tile Raycasting]
+- [Level Editor]
 # Resources Used:
 
 🖌️: [Graphics.py](https://mcsp.wartburg.edu/zelle/python/graphics.py)
