@@ -12,7 +12,7 @@ This project was created in Python using only the grapics.py library created by 
 
 🖌️: [Graphics.py](https://mcsp.wartburg.edu/zelle/python/graphics.py)
 
-🤯: [Collision Detection](https://github.com/fefong/markdown_readme/blob/master/markdown-extras.md#markdown---extras)
+🤯: [Collision Detection](https://www.jeffreythompson.org/collision-detection/)
 
 📈: [DDA Raycasting](https://til.zimventures.com/GameMaker/dda)
 
