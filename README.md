@@ -19,3 +19,4 @@ This project was created in Python using only the grapics.py library created by 
 ♟️: [A* Pathfinding](https://www.youtube.com/watch?v=-L-WgKMFuhE)
 
  Art: [Warped Lab](https://opengameart.org/content/warped-top-down-tech-lab)  
+      [Halloween Graphics](https://finalbossblues.itch.io/halloween-graphics)
