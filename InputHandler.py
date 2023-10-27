@@ -15,6 +15,9 @@ class InputHandler(object):
         self.__vKey = False
         self.__equalKey = False
 
+        self.numberKeyFunc = None
+        self.keyPressedFunc = None
+
     def lmbReleased(self):
         self.__lmb = False
 
@@ -26,12 +29,12 @@ class InputHandler(object):
     def rmbPressed(self):
         self.__rmb = True
 
-
     def keyPressed(self, evnt):
         evnt = evnt.lower()
         if (evnt != self.__currentKey):
             self.__currentKey = evnt
             print("pressed: " + self.__currentKey)
+            self.keyPressedFunc(evnt)
             if (evnt == "w"):
                 self.__wKey = True
             if (evnt == "s"):
@@ -67,7 +70,8 @@ class InputHandler(object):
             self.__equalKey = True
         if (evnt == 'b'):
             self.__bKey = True
-
+        if (evnt in "1234567890"):
+            self.numberKeyFunc(evnt)
     def getYAxis(self) -> int:
         if (self.__wKey and self.__sKey):
             return 0
@@ -97,3 +101,7 @@ class InputHandler(object):
 
     def getMousePos(self) -> tuple:
         return (self.__mouseX,self.__mouseY)
+    def setNumberKeyFunc(self,func):
+        self.numberKeyFunc = func
+    def setKeyPressedFunc(self,func):
+        self.keyPressedFunc = func

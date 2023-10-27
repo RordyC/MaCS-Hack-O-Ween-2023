@@ -5,7 +5,7 @@ from math import sqrt
 from time import *
 class Monster():
     def __init__(self):
-        self.__movementSpeed = 100
+        self.__movementSpeed = 80
         self.__hasLineOfSight = True
         self.__currentTargetX = 0
         self.__currentTargetY = 0
@@ -23,14 +23,11 @@ class Monster():
         self.__altImg = Image(Point(25, 25), "angry_head.png")
         self.__width = self.__img.getWidth()
         self.__dir = [0,0]
-        self.__debugT = Text(Point(200, 25), "Centered Text")
-        self.__debugT.setTextColor("white")
         print(self.__width)
 
     def draw(self, gw: GraphWin):
         self.__gw = gw
         self.__img.draw(gw)
-        self.__debugT.draw(gw)
 
     def hit(self,isHit):
 
@@ -135,8 +132,6 @@ class Monster():
 
         self.__playerDir[0] = dx
         self.__playerDir[1] = dy
-
-        self.__debugT.setText("Monster Dir: " + str(self.__playerDir[0].__round__(2)) + ":" + str(self.__playerDir[1].__round__(2)))
     def getPlayerDir(self):
         return self.__playerDir
     def getPlayerDist(self):
