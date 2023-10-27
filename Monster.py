@@ -15,9 +15,10 @@ class Monster():
         self.width = 25
 
         self.__path = []
-        self.__currentPathTarget = [100, 100]
+        self.__currentTarget = [0,0]
+        self.__currentPathTargetPos = [100, 100]
 
-        self.__img = Image(Point(25, 25), "head.png")
+        self.__img = Image(Point(25, 25), "sprites/ghost/test_ghost.png")
         self.__gw = None
         self.__angry = False
         self.__altImg = Image(Point(25, 25), "angry_head.png")
@@ -37,14 +38,15 @@ class Monster():
             return
 
         if (isHit):
-            self.__img.undraw()
-            self.__altImg.draw(self.__gw)
+            #self.__img.undraw()
+            #self.__altImg.draw(self.__gw)
             # commented out game over screen because it is annoying when looking for coords and stuff xd
             self.game_over_screen()
 
         else:
-            self.__altImg.undraw()
-            self.__img.draw(self.__gw)
+            pass
+           # self.__altImg.undraw()
+           # self.__img.draw(self.__gw)
 
     def game_over_screen(self):
         return
@@ -96,15 +98,16 @@ class Monster():
             self.dx = (self.__currentTargetX - self.__img.getAnchor().x)
             self.dy = (self.__currentTargetY - self.__img.getAnchor().y)
         else:
-            self.dx = (self.__currentPathTarget[0] - self.__img.getAnchor().x)
-            self.dy = (self.__currentPathTarget[1] - self.__img.getAnchor().y)
+            self.dx = (self.__currentPathTargetPos[0] - self.__img.getAnchor().x)
+            self.dy = (self.__currentPathTargetPos[1] - self.__img.getAnchor().y)
 
-        if (abs(self.dx) < 35 and abs(self.dy) < 35):
+        if (abs(self.dx) < 12 and abs(self.dy) < 12):
             if (self.__hasLineOfSight == False and len(self.__path) > 0):
                 target = self.__path.pop(0)
+                self.__currentTarget = target
 
-                self.__currentPathTarget[0] = (target[1] * 32) + 16
-                self.__currentPathTarget[1] = (target[0] * 32) + 16
+                self.__currentPathTargetPos[0] = (target[1] * 32) + 16
+                self.__currentPathTargetPos[1] = (target[0] * 32) + 16
                 print(target[0] * 32,target[1])
 
         self.m = sqrt(abs((self.dx * self.dx) + abs(self.dy * self.dy)))
@@ -139,22 +142,17 @@ class Monster():
     def updatePath(self, path):
         self.__path = path
 
-        closestDistance = math.inf
-        closestInd = 0
+        for i, p in enumerate(self.__path):
+            if (p == self.__currentTarget):
+                print("N")
+                for x in range(0,i):
+                    self.__path.pop(0)
 
-        for i, p in enumerate(path):
-            currentDist = (p[0] * p[0]) + (p[1] * p[1])
-            if (currentDist < closestDistance):
-                closestDistance = currentDist
-                print(closestDistance)
-                closestInd = i
-                break
 
-        for i in range(0, closestInd):
-            self.__path.pop(i)
 
         target = self.__path.pop(0)
-        self.__currentPathTarget[0] = (target[1] * 32) + 16
-        self.__currentPathTarget[1] = (target[0] * 32) + 16
+        self.__currentTarget == target
+        self.__currentPathTargetPos[0] = (target[1] * 32) + 16
+        self.__currentPathTargetPos[1] = (target[0] * 32) + 16
     def updateLineOfSight(self, los:bool):
         self.__hasLineOfSight = los

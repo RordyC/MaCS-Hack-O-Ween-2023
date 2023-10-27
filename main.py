@@ -58,6 +58,7 @@ endTile: TileBase = None
 startTile: TileBase = None
 nearTiles = []
 
+sprites = []
 selectedSprite = None
 
 def main():
@@ -66,14 +67,14 @@ def main():
 def menu():
     # all background info
     white_background = Rectangle(Point(0, 0), Point(961, 705))
-    white_background.setFill('white')
+    white_background.setFill('black')
     white_background.draw(gw)
     menuBackground = Image(Point(480, 352), 'blood.png')
 
     # Title 
-    titleLabel = Text(Point(480, 100), 'THE GAME')
+    titleLabel = Text(Point(480, 100), 'GHOUL ESCAPE')
     titleLabel.setSize(28)
-    titleLabel.setTextColor('black')
+    titleLabel.setTextColor('orange')
     titleLabel.setStyle('bold italic')
 
     # Start button
@@ -88,7 +89,7 @@ def menu():
     # Quit button
     quitLabel = Text(Point( 480, 425), 'Exit To Desktop')
     quitLabel.setSize(20)
-    quitLabel.setTextColor('white')
+    quitLabel.setTextColor('black')
     quitLabel.setStyle('bold italic')
 
     quitButton = Rectangle(Point(353, 400), Point(607, 450))
@@ -122,6 +123,7 @@ def game():
     global deltaT
     global sprites
     makeGrid()
+    loadWorld()
     game_over = False
 
     offsetX = 0
@@ -148,13 +150,13 @@ def game():
             grid[row][col].draw(gw)
     testDoor.draw(gw)
 
-    sprites = []
-    sprite1 = WorldSprite(500,500,1,0,gw,0)
-    sprite2 = WorldSprite(564,500,0,0,gw,0)
-    sprite3 = WorldSprite(564,500,0,1,gw,1)
-    sprites.append(sprite1)
-    sprites.append(sprite2)
-    sprites.append(sprite3)
+
+    #sprite1 = WorldSprite(500,500,1,0,0,gw)
+    #sprite2 = WorldSprite(564,500,0,0,0,gw)
+    #sprite3 = WorldSprite(564,500,0,1,1,gw)
+    #sprites.append(sprite1)
+    #sprites.append(sprite2)
+    #sprites.append(sprite3)
     for sprite in sprites:
         sprite.draw()
 
@@ -198,11 +200,6 @@ def game():
         else:
             sightLine.setFill("cyan")
             monster.updateLineOfSight(True)
-
-        if gw.checkKey() == 'b':
-            toggleWorldEdit()
-        if gw.checkKey() == 'i':
-            saveWorld()
 
         if (inputHandler.getMousePressed() and editView and selectedSprite == None):
             print("!")
@@ -484,33 +481,48 @@ def saveWorld():
 
     with open('grid_data', 'wb') as f:
         pickle.dump(gridData, f)
+    with open('sprite_data','wb') as f:
+        pickle.dump(spriteData,f)
+def loadWorld():
+    print("Loading World Sprites...")
+    global sprites
+    spriteData = []
+
+    with open('sprite_data','rb') as f:
+        spriteData = pickle.load(f)
+    print(spriteData)
+    for s in spriteData:
+        newSprite = WorldSprite(s[0],s[1],s[2],s[3],s[4],gw)
+        sprites.append(newSprite)
+
 def toggleDebugView():
     global debugView
     if (debugView):
         debugView = False
 
-    else:
-        debugView = True
-def toggleWorldEdit():
-    global editView
-    if (editView):
-        editView = False
         mousePosTxt.undraw()
 
         runtimeTxt.undraw()
         fpsTxt.undraw()
         gridIndexTxt.undraw()
         rayTxt.undraw()
-        global sprites
-        for s in sprites:
-            s.editMode(False)
     else:
-        editView = True
+        debugView = True
         mousePosTxt.draw(gw)
         runtimeTxt.draw(gw)
         fpsTxt.draw(gw)
         gridIndexTxt.draw(gw)
         rayTxt.draw(gw)
+def toggleWorldEdit():
+    global editView
+    if (editView):
+        editView = False
+
+        global sprites
+        for s in sprites:
+            s.editMode(False)
+    else:
+        editView = True
         for s in sprites:
             s.editMode(True)
 def numberKeyPressed(number:str):
@@ -526,9 +538,13 @@ def keyPressed(key:str):
     if (key == 'v'):
         toggleDebugView()
         print("Showing grid: ")
-        for row in grid:
-            for tile in row:
-                tile.toggleDebug(True)
+        #for row in grid:
+            #for tile in row:
+                #tile.toggleDebug(True)
+    if (key == 'i'):
+        saveWorld()
+    if (key == 'b'):
+        toggleWorldEdit()
     pass
 def mouseToWorld():
     pos = inputHandler.getMousePos()

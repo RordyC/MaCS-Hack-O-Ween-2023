@@ -10,7 +10,7 @@ paths = [
         ]
 
 class WorldSprite():
-    def __init__(self,x,y,typeID:int,typeVariationID:int,win:graphics.GraphWin,layer:int):
+    def __init__(self,x,y,typeID:int,typeVariationID:int,layer:int,win:graphics.GraphWin):
         self.x = x
         self.y = y
         self.__typeInd = typeID

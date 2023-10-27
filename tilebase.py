@@ -51,10 +51,12 @@ class TileBase:
             self.__updateVisuals()
 
     def __updateVisuals(self):
+
         if self.showDebug:
             if not self.isDrawn:
                 self.isDrawn = True
                 self.rect.draw(self.win)
+                self.win.lower(self.rect.id)
             self.rect.setFill(self.stateColors[self.state])
             self.rect.setOutline(self.stateOutlines[self.state])
         else:
