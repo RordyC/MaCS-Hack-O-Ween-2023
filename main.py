@@ -15,6 +15,7 @@ from queue import PriorityQueue
 from Collisions import *
 from WorldSprite import WorldSprite
 import pickle
+from Key import Key
 #from Doors import Door
 
 width = 705 + 256
@@ -42,7 +43,8 @@ rayTxt.setTextColor("lightgreen")
 gridIndexTxt.setTextColor("orange")
 mousePosTxt.setTextColor("cyan")
 
-testDoor = Door((64 * 5) + 2,64,0)
+testDoor = Door((64 * 5) + 2,64, )
+
 
 runtimeTxt = Text(Point(400, 25), "")
 fpsTxt = Text(Point(400, 50), "")
@@ -115,10 +117,13 @@ def menu():
     gw.update()                    
     sleep(1)               
 
+
+
 def game():
     collision_raidus = 25
     global gw
     global deltaT
+   
     makeGrid()
     game_over = False
 
@@ -129,15 +134,13 @@ def game():
     # key drawingsdda
     keys = []
     
-    key1 = Circle(Point(690, 85), 10)
-    key1.setFill('red')
+    #key1 = Key(Point(690, 85), 'keycard_red.png')
     #key2 = Circle(Point(200, 200), 10)
     #key2.setFill('green')
-    key3 = Circle(Point(505, 636), 10)
-    key3.setFill('blue')
-    keys.extend([key1, key3])
-    keys_data = [{'color':'red','circle':key1, 'collected':False},
-                {'color':'blue','circle':key3, 'collected':False}]
+    key3 = Key(Point(505, 636), 'keycard_blue.png')
+    keys.extend([key3])
+    keys_data = [
+                {'color':'blue','image':key3, 'collected':False}]
     for key in keys:
         key.draw(gw)  
 
@@ -152,7 +155,7 @@ def game():
         wall = Image(Point(64 * i, 128), "sprites/floor.png")
         wall.draw(gw)
         walls.append(wall)
-
+    
     testDoor.draw(gw)
     mousePosTxt.draw(gw)
     fpsTxt.setTextColor("yellow")
@@ -180,7 +183,7 @@ def game():
         monster.update(deltaT)
         player.update(deltaT)
         player.setCollisionTiles(nearTiles)
-        testDoor.update(deltaT)
+        #testDoor.update(deltaT, key_data['collected'])
         testDoor.setPlayerCoords(player.getPos().x,player.getPos().y)
         updateEndPos()
 
@@ -207,6 +210,10 @@ def game():
             for row in grid:
                 for tile in row:
                     tile.toggleDebug(True)
+
+        if pointCircle(player.getPos().x, player.getPos().y, testDoor._Door__posX + 32, testDoor._Door__posY + 32, 69):
+            testDoor.openDoor()
+
         if gw.checkKey() == 'i':
             saveWorld()
 
@@ -225,15 +232,22 @@ def game():
         
         deltaT = time.time() - currentTime
         for key_data in keys_data:
-            # logic to check if keys are collected, undrawing them as well
             if not key_data['collected']:
-                key_circle = key_data["circle"]
                 key_color = key_data['color']
-                if circleRect(player.getPos().x, player.getPos().y, 16, key_circle.getCenter().x, key_circle.getCenter().y, 10, 10):
-                    key_color = key_data['color']
-                    key_circle.undraw()  
-                    player.collect_keys(key_color)  
-                    key_data['collected'] = True  
+            if key_color == 'blue':
+                if not key3.is_collected() and circleRect(player.getPos().x, player.getPos().y, 16, key.image.getAnchor().x, key.image.getAnchor().y, 10, 10):
+                    key3.collect()
+                    key_data['collected'] = True
+                    player.collect_keys('blue')
+                
+            
+            if key_data['collected'] and pointCircle(player.getPos().x, player.getPos().y, testDoor.getPosX() + 32, testDoor._Door__posY + 32, 69):
+                    testDoor.update(deltaT, key_data['collected'])
+                    
+                    youWinScreen()
+            
+            
+                
 
                 
         
@@ -468,4 +482,17 @@ def toggleDebugView():
         debugView = False
     else:
         debugView = True
+def youWinScreen():
+    overlay = Rectangle(Point(0, 0), Point(961, 705))
+    overlay.setFill('black')
+    overlay.setOutline('black')
+    background = Image(Point(961/2, 705/2), "background2.png")
+    message = Text(Point(480, 100), 'YOU WIN!\nTHANKS 4 PLAYING!')
+    message.setSize(24)
+    message.setTextColor('red')
+    message.setStyle('bold italic')
+    overlay.draw(gw)
+    background.draw(gw)
+    message.draw(gw)
+    
 main()
