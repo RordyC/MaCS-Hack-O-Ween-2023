@@ -69,7 +69,6 @@ def menu():
     white_background = Rectangle(Point(0, 0), Point(961, 705))
     white_background.setFill('black')
     white_background.draw(gw)
-    menuBackground = Image(Point(480, 352), 'blood.png')
 
     # Title 
     titleLabel = Text(Point(480, 100), 'GHOUL ESCAPE')
