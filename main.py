@@ -4,8 +4,8 @@
 import random
 
 import graphics
-from Monster import *
-from Player import Player
+from characters.Monster import *
+from characters.Player import Player
 from Door import Door
 from InputHandler import *
 from graphics import *
@@ -35,7 +35,7 @@ sightLine.setFill("red")
 
 testLine = Line(player.getPos(),monster.getPos())
 testLine.setFill("green")
-mousePosTxt = Text(Point(100 + 500, 25+256), f"Mouse Pos: {0},{0}")
+mousePosTxt = Text(Point(100, 75), f"Mouse Pos: {0},{0}")
 gridIndexTxt = Text(Point(100, 50), f"Grid Index: {0},{0}")
 rayTxt = Text(Point(100, 100),f"Ray Unit Step Size: {0},{0}")
 rayTxt.setTextColor("lightgreen")
@@ -231,7 +231,7 @@ def game():
         monster.hit(circleRect(player.getPos().x, player.getPos().y, 25, sx, sy,57,57))
 
         runTime = (deltaT*1000).__round__(1)
-        mousePosTxt.setText(f"Mouse Pos: {gw.toWorld(inputHandler.getMousePos()[0],inputHandler.getMousePos()[1])}")
+        mousePosTxt.setText(f"Mouse Pos: {mouseToWorld()[0].__round__(1),mouseToWorld()[0].__round__(1)}")
         runtimeTxt.setText(f"Run Time: {str(runTime)}ms")
         fpsTxt.setText(f"FPS: {str((1000/runTime).__round__())}")
 
@@ -486,14 +486,9 @@ def saveWorld():
 def loadWorld():
     print("Loading World Sprites...")
     global sprites
-    spriteData = []
 
     with open('sprite_data','rb') as f:
-        spriteData = pickle.load(f)
-    print(spriteData)
-    for s in spriteData:
-        newSprite = WorldSprite(s[0],s[1],s[2],s[3],s[4],gw)
-        sprites.append(newSprite)
+        sprites = [WorldSprite(s[0],s[1],s[2],s[3],s[4],gw) for s in pickle.load(f)]
 
 def toggleDebugView():
     global debugView
