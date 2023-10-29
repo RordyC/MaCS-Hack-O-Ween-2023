@@ -5,7 +5,7 @@ from math import sqrt
 from time import *
 class Monster():
     def __init__(self):
-        self.__movementSpeed = 80
+        self.__movementSpeed = 85
         self.__hasLineOfSight = True
         self.__currentTargetX = 0
         self.__currentTargetY = 0
@@ -18,7 +18,7 @@ class Monster():
         self.__currentTarget = [0,0]
         self.__currentPathTargetPos = [100, 100]
 
-        self.__img = Image(Point(25, 25), "sprites/ghost/test_ghost.png")
+        self.__img = Image(Point(25, 25), "sprites/ghost/ghost1.png")
         self.__gw = None
         self.__angry = False
         self.__altImg = Image(Point(25, 25), "angry_head.png")

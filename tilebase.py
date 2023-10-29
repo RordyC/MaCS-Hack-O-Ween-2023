@@ -56,7 +56,7 @@ class TileBase:
             if not self.isDrawn:
                 self.isDrawn = True
                 self.rect.draw(self.win)
-                self.win.lower(self.rect.id)
+                #self.win.lower(self.rect.id)
             self.rect.setFill(self.stateColors[self.state])
             self.rect.setOutline(self.stateOutlines[self.state])
         else:
@@ -64,9 +64,9 @@ class TileBase:
                 if not self.isDrawn:
                     self.isDrawn = True
                     self.rect.draw(self.win)
-                    self.win.lower(self.rect.id)
-                self.rect.setFill("white")
-                self.rect.setOutline("black")
+                    #self.win.lower(self.rect.id)
+                self.rect.setFill(DEFAULT_CONFIG['fill'])
+                self.rect.setOutline("white")
             else:
                 self.rect.undraw()
                 self.isDrawn = False
@@ -104,14 +104,13 @@ class TileBase:
             self.showDebug = True
             self.__updateVisuals()
             self.score.draw(self.win)
-            self.win.lower(self.rect.id)
             self.gCostTxt.draw(self.win)
             self.fCostTxt.draw(self.win)
 
-            self.win.lower(self.score.id)
-            self.win.lower(self.gCostTxt.id)
-            self.win.lower(self.fCostTxt.id)
-            self.win.lower(self.rect.id)
+            #self.win.lower(self.score.id)
+            #self.win.lower(self.gCostTxt.id)
+            #self.win.lower(self.fCostTxt.id)
+            #self.win.lower(self.rect.id)
         else:
             self.showDebug = False
             self.__updateVisuals()

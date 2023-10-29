@@ -6,6 +6,7 @@ import random
 import graphics
 from characters.Monster import *
 from characters.Player import Player
+from game_systems.ViewShifter import ViewShifter
 from Door import Door
 from InputHandler import *
 from graphics import *
@@ -42,7 +43,7 @@ rayTxt.setTextColor("lightgreen")
 gridIndexTxt.setTextColor("orange")
 mousePosTxt.setTextColor("cyan")
 
-testDoor = Door((64 * 5) + 2,64,0)
+testDoor = Door((64 * 5),64,0)
 
 runtimeTxt = Text(Point(400, 25), "")
 fpsTxt = Text(Point(400, 50), "")
@@ -50,8 +51,8 @@ debugView = False
 editView = False
 
 deltaT = -1.0
-gridSizeX = 32
-gridSizeY = 32
+gridSizeX = 64
+gridSizeY = 64
 gridCellSize = 32
 grid = []
 endTile: TileBase = None
@@ -60,6 +61,9 @@ nearTiles = []
 
 sprites = []
 selectedSprite = None
+
+viewShifters = [ViewShifter((64 * 5),64,player,gw,(0,0),(0,-200))]
+
 
 def main():
     menu() #Calling this opens main menu
@@ -129,6 +133,10 @@ def game():
     offsetY = 0
     gw.setCoords(offsetX,height + offsetY,width + offsetX,offsetY)
 
+    for sprite in sprites:
+        if (sprite.getLayer() == 0):
+            sprite.draw()
+
     # key drawingsdda
     keys = []
     
@@ -144,20 +152,20 @@ def game():
     for key in keys:
         key.draw(gw)  
 
-    for row in range(len(grid)):
-        for col in range(len(grid[row])):
-            grid[row][col].draw(gw)
+
     testDoor.draw(gw)
 
 
-    #sprite1 = WorldSprite(500,500,1,0,0,gw)
-    #sprite2 = WorldSprite(564,500,0,0,0,gw)
-    #sprite3 = WorldSprite(564,500,0,1,1,gw)
-    #sprites.append(sprite1)
-    #sprites.append(sprite2)
-    #sprites.append(sprite3)
     for sprite in sprites:
-        sprite.draw()
+        if (sprite.getLayer() == 1):
+            sprite.draw()
+    for sprite in sprites:
+        if (sprite.getLayer() == 2):
+            sprite.draw()
+
+    for row in range(len(grid)):
+        for col in range(len(grid[row])):
+            grid[row][col].draw(gw)
 
 
     fpsTxt.setTextColor("yellow")
@@ -182,6 +190,8 @@ def game():
         player.setCollisionTiles(nearTiles)
         testDoor.update(deltaT)
         testDoor.setPlayerCoords(player.getPos().x,player.getPos().y)
+        for i in viewShifters:
+            i.update()
         updateEndPos()
 
         gridEditing()
@@ -200,6 +210,7 @@ def game():
             sightLine.setFill("cyan")
             monster.updateLineOfSight(True)
 
+
         if (inputHandler.getMousePressed() and editView and selectedSprite == None):
             print("!")
             closestSprite = None
@@ -207,8 +218,8 @@ def game():
 
             for sprite in sprites:
                 print("b")
-                currentDist = (((mouseToWorld()[0] -sprite.getGrabPointPos().x)*(mouseToWorld()[0] -sprite.getGrabPointPos().x)) \
-                              + (mouseToWorld()[1]-sprite.getGrabPointPos().y)*(mouseToWorld()[1]-sprite.getGrabPointPos().y))
+                currentDist = (((mouseToWorld()[0] - sprite.getGrabPointPos().x)*(mouseToWorld()[0] - sprite.getGrabPointPos().x)) \
+                              + (mouseToWorld()[1] - sprite.getGrabPointPos().y)*(mouseToWorld()[1] - sprite.getGrabPointPos().y))
                 if ((abs(currentDist) < closestDist)and currentDist < 256):
                     closestDist = currentDist
                     closestSprite = sprite
@@ -221,13 +232,13 @@ def game():
             selectedSprite = None
 
         if (selectedSprite != None):
-            selectedSprite.setPos(mouseToWorld()[0]//gridSizeX *gridCellSize,mouseToWorld()[1]//gridSizeY * gridCellSize)
+            selectedSprite.setPos((mouseToWorld()[0]//gridCellSize) * gridCellSize,(mouseToWorld()[1]//gridCellSize) * gridCellSize)
 
 
         sx = monster.getPos().x - 57/2
         sy = monster.getPos().y - 57/2
 
-        monster.hit(circleRect(player.getPos().x, player.getPos().y, 25, sx, sy,57,57))
+        monster.hit(circleRect(player.getPos().x, player.getPos().y, 16, sx, sy,57,57))
 
         runTime = (deltaT*1000).__round__(1)
         mousePosTxt.setText(f"Mouse Pos: {mouseToWorld()[0].__round__(1),mouseToWorld()[0].__round__(1)}")
@@ -236,9 +247,20 @@ def game():
 
         time.sleep((0.1/1000))   #Calling this redraws everything on screen.
         gw.update()
-        gw.setCoords(offsetX, height + offsetY, width + offsetX, offsetY)
-        
+
         deltaT = time.time() - currentTime
+
+
+        if (debugView):
+            cameraVX = inputHandler.getArrowXAxis() * 1024 * deltaT
+            cameraVY = inputHandler.getArrowYAxis() * 1024 * deltaT
+            offsetX = offsetX + cameraVX
+            offsetY = offsetY + cameraVY
+            if (cameraVX != 0 or cameraVY != 0):
+                gw.setCoords(offsetX, height + offsetY, width + offsetX, offsetY)
+
+
+
         for key_data in keys_data:
             # logic to check if keys are collected, undrawing them as well
             if not key_data['collected']:
@@ -278,11 +300,11 @@ def makeGrid():
     print(f'Grid Size: {count}')
 
 def gridEditing():
-    col = inputHandler.getMousePos()[0] // gridCellSize
+    col = int(mouseToWorld()[0] // gridCellSize)
     if not (col < gridSizeX):
         col = 0
 
-    row = inputHandler.getMousePos()[1] // gridCellSize
+    row = int(mouseToWorld()[1] // gridCellSize)
     if not (row < gridSizeY):
         row = 0
     gridIndexTxt.setText(f"Grid Index: [{row}][{col}]")
@@ -489,10 +511,13 @@ def loadWorld():
     with open('sprite_data','rb') as f:
         sprites = [WorldSprite(s[0],s[1],s[2],s[3],s[4],gw) for s in pickle.load(f)]
 
-def toggleDebugView():
+def toggleDebugView(activate:bool):
     global debugView
-    if (debugView):
-        debugView = False
+    if (debugView == activate):
+        return
+    debugView = activate
+
+    if not (debugView):
 
         mousePosTxt.undraw()
 
@@ -500,25 +525,28 @@ def toggleDebugView():
         fpsTxt.undraw()
         gridIndexTxt.undraw()
         rayTxt.undraw()
+        for i in viewShifters:
+            i.undraw()
     else:
-        debugView = True
         mousePosTxt.draw(gw)
         runtimeTxt.draw(gw)
         fpsTxt.draw(gw)
         gridIndexTxt.draw(gw)
         rayTxt.draw(gw)
-def toggleWorldEdit():
+        for i in viewShifters:
+            i.draw()
+def toggleWorldEdit(activate:bool):
     global editView
-    if (editView):
-        editView = False
+    global selectedSprite
+    if (editView == activate):
+        return
 
-        global sprites
-        for s in sprites:
-            s.editMode(False)
-    else:
-        editView = True
-        for s in sprites:
-            s.editMode(True)
+    editView = activate
+    global sprites
+    for s in sprites:
+         s.editMode(activate)
+    if not editView:
+        selectedSprite = None
 def numberKeyPressed(number:str):
     global selectedSprite
     if (selectedSprite != None):
@@ -527,22 +555,39 @@ def numberKeyPressed(number:str):
         else:
             selectedSprite.updateVariation(1)
 def keyPressed(key:str):
-    if (key == 'right'):
-        gw.setCoords(50, height + 50, width + 50, 50)
     if (key == 'v'):
-        toggleDebugView()
-        print("Showing grid: ")
-        #for row in grid:
-            #for tile in row:
-                #tile.toggleDebug(True)
+        toggleWorldEdit(False)
+        if (debugView):
+            toggleDebugView(False)
+        else:
+            toggleDebugView(True)
     if (key == 'i'):
         saveWorld()
     if (key == 'b'):
-        toggleWorldEdit()
-    pass
+        if (editView):
+            toggleWorldEdit(False)
+        else:
+            toggleWorldEdit(True)
+        toggleDebugView(False)
+    if (key == 'g'):
+        print("Showing grid: ")
+        for row in grid:
+            for tile in row:
+                tile.toggleDebug(True)
+def rmbPressed():
+    if (selectedSprite == None):
+        if (editView):
+             newSprite = WorldSprite(mouseToWorld()[0],mouseToWorld()[1],0,0,0,gw)
+             newSprite.redraw()
+             sprites.append(newSprite)
+    else:
+        selectedSprite.toggleLayer()
 def mouseToWorld():
     pos = inputHandler.getMousePos()
     return gw.toWorld(pos[0],pos[1])
+
 inputHandler.setNumberKeyFunc(numberKeyPressed)
 inputHandler.setKeyPressedFunc(keyPressed)
+inputHandler.setRMBPressedFunc(rmbPressed)
+
 main()
