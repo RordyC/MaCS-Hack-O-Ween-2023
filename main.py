@@ -61,7 +61,7 @@ nearTiles = []
 
 sprites = []
 selectedSprite = None
-
+lastTileType = (0,0)
 viewShifters = [ViewShifter((64 * 5),64,player,gw,(0,0),(0,-200))]
 
 
@@ -228,9 +228,10 @@ def game():
             print(closestSprite)
             selectedSprite = closestSprite
 
-
+        global lastTileType
         if (inputHandler.getMousePressed() == False and selectedSprite != None):
             print(":(")
+            lastTileType = selectedSprite.getType()
             selectedSprite = None
 
         if (selectedSprite != None):
@@ -554,6 +555,8 @@ def numberKeyPressed(number:str):
     if (selectedSprite != None):
         if (number == "1"):
             selectedSprite.updateType(1)
+        elif (number== "3"):
+            selectedSprite.toggleLayer()
         else:
             selectedSprite.updateVariation(1)
 def keyPressed(key:str):
@@ -579,7 +582,7 @@ def keyPressed(key:str):
 def rmbPressed():
     if (selectedSprite == None):
         if (editView):
-             newSprite = WorldSprite(mouseToWorld()[0],mouseToWorld()[1],0,0,0,gw)
+             newSprite = WorldSprite(mouseToWorld()[0]//gridCellSize * gridCellSize,mouseToWorld()[1]//gridCellSize * gridCellSize,lastTileType[0],lastTileType[1],0,gw)
              newSprite.redraw()
              sprites.append(newSprite)
     else:

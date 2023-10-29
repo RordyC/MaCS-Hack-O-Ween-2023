@@ -2,11 +2,13 @@ import graphics
 from graphics import *
 
 paths = [
-    ["sprites/walls/wall_front.png","sprites/walls/wall_front_right.png","sprites/walls/wall_front_left.png"],
-    ["sprites/floors/floor_top.png","sprites/floors/floor_top_door.png","sprites/floors/floor_right.png","sprites/floors/floor_left.png"],
-    ["sprites/floors/floor_base.png","sprites/floors/floor_vent_left.png","sprites/floors/floor_vent_right.png"],
-    ["sprites/walls/wall_back.png","sprites/walls/wall_back_right.png","sprites/walls/wall_back_left.png","sprites/walls/wall_left.png","sprites/walls/wall_right.png"],
-    ["sprites/blood/blood_top1.png","sprites/blood/blood_top2.png"]
+    ["sprites/walls/wall_front","sprites/walls/wall_front_right","sprites/walls/wall_front_left"],
+    ["sprites/floors/floor_top","sprites/floors/floor_top_door","sprites/floors/floor_right","sprites/floors/floor_left","sprites/floors/floor_left_top_corner","sprites/floors/floor_right_top_corner","sprites/floors/floor_left_bottom_corner"],
+    ["sprites/floors/floor_base","sprites/floors/floor_vent_left","sprites/floors/floor_vent_right"],
+    ["sprites/walls/wall_back","sprites/walls/wall_back_right","sprites/walls/wall_back_left","sprites/walls/wall_left","sprites/walls/wall_right"],
+    ["sprites/blood/blood_top1","sprites/blood/blood_top2"],
+    ["sprites/key_wall/key_wall_blue", "sprites/key_wall/key_wall_red", "sprites/key_wall/key_wall_yellow","sprites/key_wall/key_wall_green",
+     "sprites/walls/wall_left", "sprites/walls/wall_right"]
         ]
 
 class WorldSprite():
@@ -16,7 +18,7 @@ class WorldSprite():
         self.__typeInd = typeID
         self.__typeVar = typeVariationID
         self.__win = win
-        self.__image = Image(Point(self.x,self.y),paths[self.__typeInd][self.__typeVar])
+        self.__image = Image(Point(self.x,self.y),(paths[self.__typeInd][self.__typeVar] + ".png"))
         self.__grabPoint = Circle(Point(self.x,self.y),10)
         self.__grabPoint.setFill("Cyan")
         self.__grabPoint.setOutline("White")
@@ -45,13 +47,13 @@ class WorldSprite():
         self.__image.undraw()
         self.__grabPoint.undraw()
         self.__layerText.undraw()
-        self.__image = Image(Point(self.x, self.y), paths[self.__typeInd][self.__typeVar])
+        self.__image = Image(Point(self.x, self.y), (paths[self.__typeInd][self.__typeVar] + ".png"))
         self.__image.draw(self.__win)
         self.__grabPoint.draw(self.__win)
         self.__layerText.draw(self.__win)
-        self.__win.lower(self.__layerText.id)
-        self.__win.lower(self.__grabPoint.id)
-        self.__win.lower(self.__image.id)
+        #self.__win.lower(self.__layerText.id)
+        #self.__win.lower(self.__grabPoint.id)
+        #self.__win.lower(self.__image.id)
     def updateType(self, type:int):
         self.__typeInd = self.__typeInd + 1
         self.__typeVar = 0
@@ -77,5 +79,7 @@ class WorldSprite():
             self.__layerText.draw(self.__win)
     def getData(self):
         return (self.x,self.y,self.__typeInd,self.__typeVar,self.__layer)
+    def getType(self):
+        return (self.__typeInd,self.__typeVar)
     def getLayer(self):
         return self.__layer

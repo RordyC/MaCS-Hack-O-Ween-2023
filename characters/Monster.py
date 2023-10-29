@@ -5,7 +5,7 @@ from math import sqrt
 from time import *
 class Monster():
     def __init__(self):
-        self.__movementSpeed = 85
+        self.__movementSpeed = 90
         self.__hasLineOfSight = True
         self.__currentTargetX = 0
         self.__currentTargetY = 0
