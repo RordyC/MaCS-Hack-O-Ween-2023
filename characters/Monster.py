@@ -18,10 +18,10 @@ class Monster():
         self.__currentTarget = [0,0]
         self.__currentPathTargetPos = [100, 100]
 
-        self.__img = Image(Point(25, 25), "sprites/ghost/ghost1.png")
+        self.__img = Image(Point(133, 133), "sprites/ghost/ghost1.png")
         self.__gw = None
         self.__angry = False
-        self.__altImg = Image(Point(25, 25), "sprites/angry_head.png")
+        self.__altImg = Image(Point(133, 133), "sprites/angry_head.png")
         self.__width = self.__img.getWidth()
         self.__dir = [0,0]
         print(self.__width)

@@ -160,6 +160,10 @@ def game():
     keys.append(key_blue)
     key_red = Key(435, 435, 'red',player)
     keys.append(key_red)
+    key_yellow = Key(550, 636, 'yellow',player)
+    keys.append(key_yellow)
+    key_green = Key(400, 435, 'green',player)
+    keys.append(key_green)
     for key in keys:
         key.draw(gw)  
 
@@ -260,7 +264,7 @@ def game():
         monster.hit(circleRect(player.getPos().x, player.getPos().y, 16, sx, sy,57,57))
 
         runTime = (deltaT*1000).__round__(1)
-        mousePosTxt.setText(f"Mouse Pos: {mouseToWorld()[0].__round__(1),mouseToWorld()[0].__round__(1)}")
+        mousePosTxt.setText(f"Mouse Pos: {mouseToWorld()[0].__round__(1),mouseToWorld()[1].__round__(1)}")
         runtimeTxt.setText(f"Run Time: {str(runTime)}ms")
         fpsTxt.setText(f"FPS: {str((1000/runTime).__round__())}")
 

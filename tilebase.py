@@ -53,6 +53,10 @@ class TileBase:
     def __updateVisuals(self):
 
         if self.showDebug:
+            if (self.state != 6 and self.state != 1):
+                self.rect.undraw()
+                self.isDrawn = False
+                return
             if not self.isDrawn:
                 self.isDrawn = True
                 self.rect.draw(self.win)
