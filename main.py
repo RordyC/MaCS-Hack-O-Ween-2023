@@ -120,7 +120,6 @@ def menu():
 
 
 def game():
-    collision_raidus = 25
     global gw
     global deltaT
    
@@ -130,7 +129,17 @@ def game():
     #gw.setCoords(0+ 500,705,705 + 500,0)
     walls = []
     floors = []
+    image_paths = ["small_button.png", "angry_head.png", "keycard_red.png"]
 
+# Start with the first image
+    current_image_index = 0
+    current_image = Image(Point(200, 200), image_paths[current_image_index])
+    current_image.draw(gw)
+
+# Time delay in seconds between image changes
+    image_delay = 1.0  # Change this to your desired delay
+    
+    # current_image = player_images[current_image_index]
     # key drawingsdda
     keys = []
     
@@ -231,6 +240,7 @@ def game():
         gw.update()
         
         deltaT = time.time() - currentTime
+        
         for key_data in keys_data:
             if not key_data['collected']:
                 key_color = key_data['color']
@@ -243,8 +253,19 @@ def game():
             
             if key_data['collected'] and pointCircle(player.getPos().x, player.getPos().y, testDoor.getPosX() + 32, testDoor._Door__posY + 32, 69):
                     testDoor.update(deltaT, key_data['collected'])
-                    
-                    youWinScreen()
+
+        #time.sleep(image_delay)
+
+    # Undraw the current image
+        current_image.undraw()
+
+    # Move to the next image
+        current_image_index = (current_image_index + 1) % len(image_paths)
+        current_image = Image(Point(200, 200), image_paths[current_image_index])
+        current_image.draw(gw)            
+     
+        
+                    #youWinScreen()
             
             
                 

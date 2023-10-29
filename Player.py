@@ -1,6 +1,7 @@
 from graphics import *
 from InputHandler import *
 from Collisions import circleRectMove
+from Animation import Animation
 
 class Player():
     def __init__(self, playerStart:Point,inputHandler:InputHandler):
@@ -16,8 +17,6 @@ class Player():
         self.collected_keys = []
         self.__ct = [] #The tiles that the player will check for collision with.
 
-    def draw(self, gw: GraphWin):
-            self.__circle.draw(gw)
     
     def collect_keys(self, key_color):
         if key_color in self.keys and not self.keys[key_color]:
@@ -47,11 +46,16 @@ class Player():
 
         step = [potentialPosition[0] - currentX, potentialPosition[1] - currentY]
         self.__circle.move(step[0],step[1])
+        
         pass
     def getPos(self):
         return self.__circle.getCenter()
 
     def setCollisionTiles(self, tiles):
         self.__ct = tiles
+    
+    def draw(self, gw: GraphWin):
+            self.__circle.draw(gw)
+          
 
 
