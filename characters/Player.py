@@ -4,6 +4,7 @@ from Collisions import circleRectMove
 
 class Player():
     def __init__(self, playerStart:Point,inputHandler:InputHandler):
+        self.__startPoint = playerStart
         self.__inputHandler = inputHandler #Using this we can get direction the player wants to move!
         self.__circle = Circle(playerStart, 16)
         self.__circle.setFill("orange")
@@ -42,6 +43,10 @@ class Player():
         self.__circle.move(step[0],step[1])
     def getPos(self):
         return self.__circle.getCenter()
+    def resetPos(self):
+        dx = self.__startPoint.x - self.__circle.getCenter().x
+        dy = self.__startPoint.y - self.__circle.getCenter().y
+        self.__circle.move(dx, dy)
 
     def setCollisionTiles(self, tiles):
         self.__ct = tiles

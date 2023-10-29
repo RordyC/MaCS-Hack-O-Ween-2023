@@ -48,7 +48,10 @@ class Door():
             tile.updateState(0)
     def checkPlayer(self):
         if (pointCircle(self.__player.getPos().x,self.__player.getPos().y,self.__posX,self.__posY,75) and self.__is_open == False):
-            if self.__player.has_key(self.__keycard):
+            if (self.__keycard == None):
                 self.openDoor()
+            elif self.__player.has_key(self.__keycard):
+                self.openDoor()
+
     def setTiles(self, tiles):
         self.__tiles = tiles
