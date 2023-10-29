@@ -142,7 +142,7 @@ def game():
     #gw.setCoords(0+ 500,705,705 + 500,0)
     walls = []
     floors = []
-    image_paths = ["small_button.png", "angry_head.png", "keycard_red.png"]
+    image_paths = ["small_button.png", "sprites/angry_head.png", "keycard_red.png"]
 
 # Start with the first image
     current_image_index = 0
@@ -150,7 +150,7 @@ def game():
     current_image.draw(gw)
 
 # Time delay in seconds between image changes
-    image_delay = 1.0  # Change this to your desired delay
+    image_delay = 100.0  # Change this to your desired delay
 
     # current_image = player_images[current_image_index]
     # key drawingsdda
@@ -200,10 +200,12 @@ def game():
 
         monster.setTargetPos(player.getPos().x,player.getPos().y)
         monster.update(deltaT)
+
         player.update(deltaT)
         player.setCollisionTiles(nearTiles)
-        #testDoor.update(deltaT, key_data['collected'])
+
         testDoor.setPlayerCoords(player.getPos().x,player.getPos().y)
+
         for i in viewShifters:
             i.update()
         updateEndPos()
@@ -270,8 +272,6 @@ def game():
 
         deltaT = time.time() - currentTime
 
-
-
         if (debugView):
             cameraVX = inputHandler.getArrowXAxis() * 1024 * deltaT
             cameraVY = inputHandler.getArrowYAxis() * 1024 * deltaT
@@ -279,8 +279,6 @@ def game():
             offsetY = offsetY + cameraVY
             if (cameraVX != 0 or cameraVY != 0):
                 gw.setCoords(offsetX, height + offsetY, width + offsetX, offsetY)
-
-
 
         for key_data in keys_data:
             if not key_data['collected']:
@@ -291,27 +289,17 @@ def game():
                     key_data['collected'] = True
                     player.collect_keys('blue')
 
-
             if key_data['collected'] and pointCircle(player.getPos().x, player.getPos().y, testDoor.getPosX() + 32, testDoor._Door__posY + 32, 69):
                     testDoor.update(deltaT, key_data['collected'])
 
-        #time.sleep(image_delay)
-
         current_image.undraw()
-
 
         current_image_index = (current_image_index + 1) % len(image_paths)
         current_image = Image(Point(200, 200), image_paths[current_image_index])
         current_image.draw(gw)
 
+        #youWinScreen()
 
-                    #youWinScreen()
-
-
-
-
-                
-        
         if (gw.closed): #When the window is closed the gameloop finishes
             done = True
             
