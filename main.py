@@ -44,7 +44,11 @@ rayTxt.setTextColor("lightgreen")
 gridIndexTxt.setTextColor("orange")
 mousePosTxt.setTextColor("cyan")
 
-testDoor = Door((64 * 5),64, )
+doors = []
+redDoor = Door((64 * 5),64, "red",player)
+blueDoor = Door((64 * 13),64 *11, "blue",player)
+doors.append(redDoor)
+doors.append(blueDoor)
 
 runtimeTxt = Text(Point(400, 25), "")
 fpsTxt = Text(Point(400, 50), "")
@@ -139,9 +143,7 @@ def game():
     for sprite in sprites:
         if (sprite.getLayer() == 0):
             sprite.draw()
-    #gw.setCoords(0+ 500,705,705 + 500,0)
-    walls = []
-    floors = []
+
     image_paths = ["small_button.png", "sprites/angry_head.png", "keycard_red.png"]
 
 # Start with the first image
@@ -152,23 +154,17 @@ def game():
 # Time delay in seconds between image changes
     image_delay = 100.0  # Change this to your desired delay
 
-    # current_image = player_images[current_image_index]
-    # key drawingsdda
     keys = []
-    
-    #key1 = Key(Point(690, 85), 'keycard_red.png')
-    #key2 = Circle(Point(200, 200), 10)
-    #key2.setFill('green')
-    key3 = Key(Point(505, 636), 'keycard_blue.png')
-    keys.extend([key3])
-    keys_data = [
-                {'color':'blue','image':key3, 'collected':False}]
+
+    key_blue = Key(505, 636, 'blue',player)
+    keys.append(key_blue)
+    key_red = Key(435, 435, 'red',player)
+    keys.append(key_red)
     for key in keys:
         key.draw(gw)  
 
-
-    testDoor.draw(gw)
-
+    for door in doors:
+        door.draw(gw)
 
     for sprite in sprites:
         if (sprite.getLayer() == 1):
@@ -189,8 +185,8 @@ def game():
     monster.draw(gw)
     player.draw(gw)
 
-    testDoor.setTiles([grid[1][10],grid[1][9],grid[2][10],grid[2][9]])
-
+    redDoor.setTiles([grid[1][10],grid[1][9],grid[2][10],grid[2][9]])
+    blueDoor.setTiles([grid[21][25],grid[21][26],grid[22][26],grid[22][25]])
     print(len(grid))
     global selectedSprite
     game_over = False
@@ -204,11 +200,15 @@ def game():
         player.update(deltaT)
         player.setCollisionTiles(nearTiles)
 
-        testDoor.setPlayerCoords(player.getPos().x,player.getPos().y)
+        for door in doors:
+            door.update(deltaT)
 
         for i in viewShifters:
             i.update()
         updateEndPos()
+
+        for key in keys:
+            key.update()
 
         gridEditing()
 
@@ -251,9 +251,6 @@ def game():
         if (selectedSprite != None):
             selectedSprite.setPos((mouseToWorld()[0]//gridCellSize) * gridCellSize,(mouseToWorld()[1]//gridCellSize) * gridCellSize)
 
-        if pointCircle(player.getPos().x, player.getPos().y, testDoor._Door__posX + 32, testDoor._Door__posY + 32, 69):
-            testDoor.openDoor()
-
         if gw.checkKey() == 'i':
             saveWorld()
 
@@ -279,18 +276,6 @@ def game():
             offsetY = offsetY + cameraVY
             if (cameraVX != 0 or cameraVY != 0):
                 gw.setCoords(offsetX, height + offsetY, width + offsetX, offsetY)
-
-        for key_data in keys_data:
-            if not key_data['collected']:
-                key_color = key_data['color']
-            if key_color == 'blue':
-                if not key3.is_collected() and circleRect(player.getPos().x, player.getPos().y, 16, key.image.getAnchor().x, key.image.getAnchor().y, 10, 10):
-                    key3.collect()
-                    key_data['collected'] = True
-                    player.collect_keys('blue')
-
-            if key_data['collected'] and pointCircle(player.getPos().x, player.getPos().y, testDoor.getPosX() + 32, testDoor._Door__posY + 32, 69):
-                    testDoor.update(deltaT, key_data['collected'])
 
         current_image.undraw()
 
