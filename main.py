@@ -4,8 +4,9 @@
 import random
 
 import graphics
-from Monster import *
-from Player import Player
+from characters.Monster import *
+from characters.Player import Player
+from game_systems.ViewShifter import ViewShifter
 from Door import Door
 from InputHandler import *
 from graphics import *
@@ -13,8 +14,9 @@ from time import *
 from tilebase import *
 from queue import PriorityQueue
 from Collisions import *
-from WorldSprite import WorldSprite
+from game_systems.WorldSprite import WorldSprite
 import pickle
+from Key import Key
 #from Doors import Door
 
 width = 705 + 256
@@ -23,7 +25,8 @@ height = 705
 gw = GraphWin("GAME", width, height,autoflush=False) #This is the window where all the graphics are drawn.
 gw.setBackground("black")
 
-inputHandler = InputHandler() #Object that receives input from the window.
+inputHandler = InputHandler() #Object that receives input from the window.\
+
 gw.setInputHandler(inputHandler)  # We pass in the input handler to the window, so it can receive input!
 
 player = Player(Point(width/2,height/2),inputHandler) #Player object that is controller by user.
@@ -34,15 +37,14 @@ sightLine.setFill("red")
 
 testLine = Line(player.getPos(),monster.getPos())
 testLine.setFill("green")
-
-mousePosTxt = Text(Point(100, 25), f"Mouse Pos: {0},{0}")
+mousePosTxt = Text(Point(100, 75), f"Mouse Pos: {0},{0}")
 gridIndexTxt = Text(Point(100, 50), f"Grid Index: {0},{0}")
 rayTxt = Text(Point(100, 100),f"Ray Unit Step Size: {0},{0}")
 rayTxt.setTextColor("lightgreen")
 gridIndexTxt.setTextColor("orange")
 mousePosTxt.setTextColor("cyan")
 
-testDoor = Door((64 * 5) + 2,64,0)
+testDoor = Door((64 * 5),64, )
 
 runtimeTxt = Text(Point(400, 25), "")
 fpsTxt = Text(Point(400, 50), "")
@@ -50,14 +52,18 @@ debugView = False
 editView = False
 
 deltaT = -1.0
-gridSizeX = 32
-gridSizeY = 32
+gridSizeX = 64
+gridSizeY = 64
 gridCellSize = 32
 grid = []
 endTile: TileBase = None
 startTile: TileBase = None
 nearTiles = []
 
+sprites = []
+selectedSprite = None
+lastTileType = (0,0)
+viewShifters = [ViewShifter((64 * 5),64,player,gw,(0,0),(0,-200))]
 
 
 def main():
@@ -66,14 +72,13 @@ def main():
 def menu():
     # all background info
     white_background = Rectangle(Point(0, 0), Point(961, 705))
-    white_background.setFill('white')
+    white_background.setFill('black')
     white_background.draw(gw)
-    menuBackground = Image(Point(480, 352), 'blood.png')
 
     # Title 
-    titleLabel = Text(Point(480, 100), 'THE GAME')
+    titleLabel = Text(Point(480, 100), 'GHOUL ESCAPE')
     titleLabel.setSize(28)
-    titleLabel.setTextColor('black')
+    titleLabel.setTextColor('orange')
     titleLabel.setStyle('bold italic')
 
     # Start button
@@ -83,7 +88,8 @@ def menu():
     startLabel.setStyle('bold italic')
 
     startButton = Rectangle(Point(353, 300), Point(607, 350))
-    startButton.setFill('lightgreen')
+    #startButton.setFill('lightgreen')
+    startButton.setOutline('orange')
 
     # Quit button
     quitLabel = Text(Point( 480, 425), 'Exit To Desktop')
@@ -92,10 +98,11 @@ def menu():
     quitLabel.setStyle('bold italic')
 
     quitButton = Rectangle(Point(353, 400), Point(607, 450))
-    quitButton.setFill('brown')
+    #quitButton.setFill('brown')
+    quitButton.setOutline('red')
     
     # Draws Menu
-    menuBackground.draw(gw)
+    #menuBackground.draw(gw)
     titleLabel.draw(gw)
     startButton.draw(gw)
     startLabel.draw(gw)
@@ -113,64 +120,79 @@ def menu():
     for item in gw.items[:]:
         item.undraw()
     gw.update()                    
-    sleep(1)               
-
+    #sleep(1)
+def drawWorld():
+    pass
 def game():
-    collision_raidus = 25
     global gw
     global deltaT
+    global sprites
+
     makeGrid()
+    loadWorld()
     game_over = False
 
+    offsetX = 0
+    offsetY = 0
+    gw.setCoords(offsetX,height + offsetY,width + offsetX,offsetY)
+
+    for sprite in sprites:
+        if (sprite.getLayer() == 0):
+            sprite.draw()
     #gw.setCoords(0+ 500,705,705 + 500,0)
     walls = []
     floors = []
+    image_paths = ["small_button.png", "sprites/angry_head.png", "keycard_red.png"]
 
+# Start with the first image
+    current_image_index = 0
+    current_image = Image(Point(200, 200), image_paths[current_image_index])
+    current_image.draw(gw)
+
+# Time delay in seconds between image changes
+    image_delay = 100.0  # Change this to your desired delay
+
+    # current_image = player_images[current_image_index]
     # key drawingsdda
     keys = []
     
-    key1 = Circle(Point(690, 85), 10)
-    key1.setFill('red')
+    #key1 = Key(Point(690, 85), 'keycard_red.png')
     #key2 = Circle(Point(200, 200), 10)
     #key2.setFill('green')
-    key3 = Circle(Point(505, 636), 10)
-    key3.setFill('blue')
-    keys.extend([key1, key3])
-    keys_data = [{'color':'red','circle':key1, 'collected':False},
-                {'color':'blue','circle':key3, 'collected':False}]
+    key3 = Key(Point(505, 636), 'keycard_blue.png')
+    keys.extend([key3])
+    keys_data = [
+                {'color':'blue','image':key3, 'collected':False}]
     for key in keys:
         key.draw(gw)  
+
+
+    testDoor.draw(gw)
+
+
+    for sprite in sprites:
+        if (sprite.getLayer() == 1):
+            sprite.draw()
+    for sprite in sprites:
+        if (sprite.getLayer() == 2):
+            sprite.draw()
 
     for row in range(len(grid)):
         for col in range(len(grid[row])):
             grid[row][col].draw(gw)
-    for i in range(5):
-        wall = Image(Point(64 * i, 64), "sprites/wall.png")
-        wall.draw(gw)
-        walls.append(wall)
-    for i in range(5):
-        wall = Image(Point(64 * i, 128), "sprites/floor.png")
-        wall.draw(gw)
-        walls.append(wall)
 
-    testDoor.draw(gw)
-    mousePosTxt.draw(gw)
+
     fpsTxt.setTextColor("yellow")
 
     runtimeTxt.setTextColor("cyan")
-    runtimeTxt.draw(gw)
-    fpsTxt.draw(gw)
-    gridIndexTxt.draw(gw)
-    rayTxt.draw(gw)
 
     monster.draw(gw)
     player.draw(gw)
-    sprite = WorldSprite(500,500,"wall",gw)
-    sprite.draw()
+
     testDoor.setTiles([grid[1][10],grid[1][9],grid[2][10],grid[2][9]])
 
     print(len(grid))
-
+    global selectedSprite
     game_over = False
     while not game_over:  # This will run until 'done' is False.
 
@@ -178,10 +200,14 @@ def game():
 
         monster.setTargetPos(player.getPos().x,player.getPos().y)
         monster.update(deltaT)
+
         player.update(deltaT)
         player.setCollisionTiles(nearTiles)
-        testDoor.update(deltaT)
+
         testDoor.setPlayerCoords(player.getPos().x,player.getPos().y)
+
+        for i in viewShifters:
+            i.update()
         updateEndPos()
 
         gridEditing()
@@ -201,42 +227,79 @@ def game():
             monster.updateLineOfSight(True)
 
 
-        if gw.checkKey() == 'v':
-            toggleDebugView()
-            print("Showing grid: ")
-            for row in grid:
-                for tile in row:
-                    tile.toggleDebug(True)
+        if (inputHandler.getMousePressed() and editView and selectedSprite == None):
+            print("!")
+            closestSprite = None
+            closestDist = math.inf
+
+            for sprite in sprites:
+                print("b")
+                currentDist = (((mouseToWorld()[0] - sprite.getGrabPointPos().x)*(mouseToWorld()[0] - sprite.getGrabPointPos().x)) \
+                              + (mouseToWorld()[1] - sprite.getGrabPointPos().y)*(mouseToWorld()[1] - sprite.getGrabPointPos().y))
+                if ((abs(currentDist) < closestDist)and currentDist < 256):
+                    closestDist = currentDist
+                    closestSprite = sprite
+            print(closestSprite)
+            selectedSprite = closestSprite
+
+        global lastTileType
+        if (inputHandler.getMousePressed() == False and selectedSprite != None):
+            print(":(")
+            lastTileType = selectedSprite.getType()
+            selectedSprite = None
+
+        if (selectedSprite != None):
+            selectedSprite.setPos((mouseToWorld()[0]//gridCellSize) * gridCellSize,(mouseToWorld()[1]//gridCellSize) * gridCellSize)
+
+        if pointCircle(player.getPos().x, player.getPos().y, testDoor._Door__posX + 32, testDoor._Door__posY + 32, 69):
+            testDoor.openDoor()
+
         if gw.checkKey() == 'i':
             saveWorld()
 
         sx = monster.getPos().x - 57/2
         sy = monster.getPos().y - 57/2
 
-        monster.hit(circleRect(player.getPos().x, player.getPos().y, 25, sx, sy,57,57))
+        monster.hit(circleRect(player.getPos().x, player.getPos().y, 16, sx, sy,57,57))
 
         runTime = (deltaT*1000).__round__(1)
-        mousePosTxt.setText(f"Mouse Pos: {inputHandler.getMousePos()}")
+        mousePosTxt.setText(f"Mouse Pos: {mouseToWorld()[0].__round__(1),mouseToWorld()[0].__round__(1)}")
         runtimeTxt.setText(f"Run Time: {str(runTime)}ms")
         fpsTxt.setText(f"FPS: {str((1000/runTime).__round__())}")
 
         time.sleep((0.1/1000))   #Calling this redraws everything on screen.
         gw.update()
-        
-        deltaT = time.time() - currentTime
-        for key_data in keys_data:
-            # logic to check if keys are collected, undrawing them as well
-            if not key_data['collected']:
-                key_circle = key_data["circle"]
-                key_color = key_data['color']
-                if circleRect(player.getPos().x, player.getPos().y, 16, key_circle.getCenter().x, key_circle.getCenter().y, 10, 10):
-                    key_color = key_data['color']
-                    key_circle.undraw()  
-                    player.collect_keys(key_color)  
-                    key_data['collected'] = True  
 
-                
-        
+        deltaT = time.time() - currentTime
+
+        if (debugView):
+            cameraVX = inputHandler.getArrowXAxis() * 1024 * deltaT
+            cameraVY = inputHandler.getArrowYAxis() * 1024 * deltaT
+            offsetX = offsetX + cameraVX
+            offsetY = offsetY + cameraVY
+            if (cameraVX != 0 or cameraVY != 0):
+                gw.setCoords(offsetX, height + offsetY, width + offsetX, offsetY)
+
+        for key_data in keys_data:
+            if not key_data['collected']:
+                key_color = key_data['color']
+            if key_color == 'blue':
+                if not key3.is_collected() and circleRect(player.getPos().x, player.getPos().y, 16, key.image.getAnchor().x, key.image.getAnchor().y, 10, 10):
+                    key3.collect()
+                    key_data['collected'] = True
+                    player.collect_keys('blue')
+
+            if key_data['collected'] and pointCircle(player.getPos().x, player.getPos().y, testDoor.getPosX() + 32, testDoor._Door__posY + 32, 69):
+                    testDoor.update(deltaT, key_data['collected'])
+
+        current_image.undraw()
+
+        current_image_index = (current_image_index + 1) % len(image_paths)
+        current_image = Image(Point(200, 200), image_paths[current_image_index])
+        current_image.draw(gw)
+
+        #youWinScreen()
+
         if (gw.closed): #When the window is closed the gameloop finishes
             done = True
             
@@ -245,7 +308,7 @@ def makeGrid():
     rows = gridSizeX
     columns = gridSizeY
     count = 0
-    with open('grid_data','rb') as f:
+    with open('save_data/grid_data','rb') as f:
         gridData = pickle.load(f)
     for row in range(rows):
         row_list = []
@@ -263,11 +326,11 @@ def makeGrid():
     print(f'Grid Size: {count}')
 
 def gridEditing():
-    col = inputHandler.getMousePos()[0] // gridCellSize
+    col = int(mouseToWorld()[0] // gridCellSize)
     if not (col < gridSizeX):
         col = 0
 
-    row = inputHandler.getMousePos()[1] // gridCellSize
+    row = int(mouseToWorld()[1] // gridCellSize)
     if not (row < gridSizeY):
         row = 0
     gridIndexTxt.setText(f"Grid Index: [{row}][{col}]")
@@ -458,14 +521,115 @@ def saveWorld():
             else:
                 rowData.append(0)
         gridData.append(rowData)
+    spriteData = []
+    for s in sprites:
+        spriteData.append(s.getData())
     print(gridData)
 
-    with open('grid_data', 'wb') as f:
+    with open('save_data/grid_data', 'wb') as f:
         pickle.dump(gridData, f)
-def toggleDebugView():
+    with open('save_data/sprite_data','wb') as f:
+        pickle.dump(spriteData,f)
+def loadWorld():
+    print("Loading World Sprites...")
+    global sprites
+
+    with open('save_data/sprite_data','rb') as f:
+        sprites = [WorldSprite(s[0],s[1],s[2],s[3],s[4],gw) for s in pickle.load(f)]
+
+def toggleDebugView(activate:bool):
     global debugView
-    if (debugView):
-        debugView = False
+    if (debugView == activate):
+        return
+    debugView = activate
+
+    if not (debugView):
+
+        mousePosTxt.undraw()
+
+        runtimeTxt.undraw()
+        fpsTxt.undraw()
+        gridIndexTxt.undraw()
+        rayTxt.undraw()
+        for i in viewShifters:
+            i.undraw()
     else:
-        debugView = True
+        mousePosTxt.draw(gw)
+        runtimeTxt.draw(gw)
+        fpsTxt.draw(gw)
+        gridIndexTxt.draw(gw)
+        rayTxt.draw(gw)
+        for i in viewShifters:
+            i.draw()
+def toggleWorldEdit(activate:bool):
+    global editView
+    global selectedSprite
+    if (editView == activate):
+        return
+
+    editView = activate
+    global sprites
+    for s in sprites:
+         s.editMode(activate)
+    if not editView:
+        selectedSprite = None
+def numberKeyPressed(number:str):
+    global selectedSprite
+    if (selectedSprite != None):
+        if (number == "1"):
+            selectedSprite.updateType(1)
+        elif (number== "3"):
+            selectedSprite.toggleLayer()
+        else:
+            selectedSprite.updateVariation(1)
+def keyPressed(key:str):
+    if (key == 'v'):
+        toggleWorldEdit(False)
+        if (debugView):
+            toggleDebugView(False)
+        else:
+            toggleDebugView(True)
+    if (key == 'i'):
+        saveWorld()
+    if (key == 'b'):
+        if (editView):
+            toggleWorldEdit(False)
+        else:
+            toggleWorldEdit(True)
+        toggleDebugView(False)
+    if (key == 'g'):
+        print("Showing grid: ")
+        for row in grid:
+            for tile in row:
+                tile.toggleDebug(True)
+def rmbPressed():
+    if (selectedSprite == None):
+        if (editView):
+             newSprite = WorldSprite(mouseToWorld()[0]//gridCellSize * gridCellSize,mouseToWorld()[1]//gridCellSize * gridCellSize,lastTileType[0],lastTileType[1],0,gw)
+             newSprite.redraw()
+             sprites.append(newSprite)
+    else:
+        selectedSprite.toggleLayer()
+def youWinScreen():
+    overlay = Rectangle(Point(0, 0), Point(961, 705))
+    overlay.setFill('black')
+    overlay.setOutline('black')
+    background = Image(Point(961/2, 705/2), "background2.png")
+    message = Text(Point(480, 100), 'YOU WIN!\nTHANKS 4 PLAYING!')
+    message.setSize(24)
+    message.setTextColor('red')
+    message.setStyle('bold italic')
+    overlay.draw(gw)
+    background.draw(gw)
+    message.draw(gw)
+
+
+def mouseToWorld():
+    pos = inputHandler.getMousePos()
+    return gw.toWorld(pos[0],pos[1])
+
+inputHandler.setNumberKeyFunc(numberKeyPressed)
+inputHandler.setKeyPressedFunc(keyPressed)
+inputHandler.setRMBPressedFunc(rmbPressed)
+
 main()
