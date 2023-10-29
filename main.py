@@ -256,10 +256,9 @@ def game():
 
         #time.sleep(image_delay)
 
-    # Undraw the current image
         current_image.undraw()
 
-    # Move to the next image
+   
         current_image_index = (current_image_index + 1) % len(image_paths)
         current_image = Image(Point(200, 200), image_paths[current_image_index])
         current_image.draw(gw)            
