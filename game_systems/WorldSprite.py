@@ -1,10 +1,9 @@
 import graphics
 from graphics import *
-from Collisions import pointCircle
 
 paths = [
     ["sprites/walls/wall_front.png","sprites/walls/wall_front_right.png","sprites/walls/wall_front_left.png"],
-    ["sprites/floors/floor_top.png","sprites/floors/floor_top_door.png"],
+    ["sprites/floors/floor_top.png","sprites/floors/floor_top_door.png","sprites/floors/floor_right.png","sprites/floors/floor_left.png"],
     ["sprites/floors/floor_base.png","sprites/floors/floor_vent_left.png","sprites/floors/floor_vent_right.png"],
     ["sprites/walls/wall_back.png","sprites/walls/wall_back_right.png","sprites/walls/wall_back_left.png","sprites/walls/wall_left.png","sprites/walls/wall_right.png"],
     ["sprites/blood/blood_top1.png","sprites/blood/blood_top2.png"]

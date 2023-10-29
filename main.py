@@ -14,7 +14,7 @@ from time import *
 from tilebase import *
 from queue import PriorityQueue
 from Collisions import *
-from WorldSprite import WorldSprite
+from game_systems.WorldSprite import WorldSprite
 import pickle
 #from Doors import Door
 
@@ -87,16 +87,18 @@ def menu():
     startLabel.setStyle('bold italic')
 
     startButton = Rectangle(Point(353, 300), Point(607, 350))
-    startButton.setFill('lightgreen')
+    #startButton.setFill('lightgreen')
+    startButton.setOutline('orange')
 
     # Quit button
     quitLabel = Text(Point( 480, 425), 'Exit To Desktop')
     quitLabel.setSize(20)
-    quitLabel.setTextColor('black')
+    quitLabel.setTextColor('white')
     quitLabel.setStyle('bold italic')
 
     quitButton = Rectangle(Point(353, 400), Point(607, 450))
-    quitButton.setFill('brown')
+    #quitButton.setFill('brown')
+    quitButton.setOutline('red')
     
     # Draws Menu
     #menuBackground.draw(gw)
@@ -282,7 +284,7 @@ def makeGrid():
     rows = gridSizeX
     columns = gridSizeY
     count = 0
-    with open('grid_data','rb') as f:
+    with open('save_data/grid_data','rb') as f:
         gridData = pickle.load(f)
     for row in range(rows):
         row_list = []
@@ -500,15 +502,15 @@ def saveWorld():
         spriteData.append(s.getData())
     print(gridData)
 
-    with open('grid_data', 'wb') as f:
+    with open('save_data/grid_data', 'wb') as f:
         pickle.dump(gridData, f)
-    with open('sprite_data','wb') as f:
+    with open('save_data/sprite_data','wb') as f:
         pickle.dump(spriteData,f)
 def loadWorld():
     print("Loading World Sprites...")
     global sprites
 
-    with open('sprite_data','rb') as f:
+    with open('save_data/sprite_data','rb') as f:
         sprites = [WorldSprite(s[0],s[1],s[2],s[3],s[4],gw) for s in pickle.load(f)]
 
 def toggleDebugView(activate:bool):
