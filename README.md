@@ -1,6 +1,8 @@
 # MaCS-Hack-O-Ween-2023 🎃
 Project for the MacEwan Computer Science Club 2023 Hackathon.
 
+Escape a laboratory where you are being chased down by an evil ressurected spririt.
+
 This project was created in Python using only the grapics.py library created by John Zelle.
 
  # Features
