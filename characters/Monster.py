@@ -7,7 +7,7 @@ class Monster():
     def __init__(self,startX,startY):
         self.__startX = startX
         self.__startY = startY
-        self.__movementSpeed = 10
+        self.__movementSpeed = 90
         self.__hasLineOfSight = True
         self.__currentTargetX = 0
         self.__currentTargetY = 0

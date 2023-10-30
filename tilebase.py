@@ -24,6 +24,7 @@ class TileBase:
 
         self.isDrawn = False
         self.showDebug = False
+        self.showTile = False
 
         self.score = Text(Point((self.col * self.width) + 24, (self.row * self.width) + 8), "inf")
         self.score.setSize(8)
@@ -51,19 +52,14 @@ class TileBase:
             self.__updateVisuals()
 
     def __updateVisuals(self):
-
         if self.showDebug:
-            if (self.state != 6 and self.state != 1):
-                self.rect.undraw()
-                self.isDrawn = False
-                return
             if not self.isDrawn:
                 self.isDrawn = True
                 self.rect.draw(self.win)
                 #self.win.lower(self.rect.id)
             self.rect.setFill(self.stateColors[self.state])
             self.rect.setOutline(self.stateOutlines[self.state])
-        else:
+        elif self.showTile:
             if (self.state == 1):
                 if not self.isDrawn:
                     self.isDrawn = True
@@ -71,7 +67,7 @@ class TileBase:
                     #self.win.lower(self.rect.id)
                 self.rect.setFill(DEFAULT_CONFIG['fill'])
                 self.rect.setOutline("white")
-            else:
+        else:
                 self.rect.undraw()
                 self.isDrawn = False
 
@@ -106,6 +102,7 @@ class TileBase:
     def toggleDebug(self, show: bool):
         if not (self.showDebug):
             self.showDebug = True
+            self.showTile = False
             self.__updateVisuals()
             self.score.draw(self.win)
             self.gCostTxt.draw(self.win)
@@ -121,6 +118,16 @@ class TileBase:
             self.score.undraw()
             self.gCostTxt.undraw()
             self.fCostTxt.undraw()
+    def toggleEditMode(self):
+        if not self.showTile:
+            self.showTile = True
+            self.__updateVisuals()
+            if (self.showDebug):
+                self.toggleDebug()
+        else:
+            self.showTile = False
+            self.__updateVisuals()
+
 
     def getState(self) -> int:
         return self.state

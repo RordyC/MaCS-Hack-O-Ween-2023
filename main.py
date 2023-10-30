@@ -60,6 +60,8 @@ blueDoor = Door((32 * 29),(32 *36), "blue",player)
 greenDoor = Door((32 * 36),(32*11), "green",player)
 yellowDoor = Door((64 * 13),(32 *21), "yellow",player)
 pinkDoor = Door((32 * 2),(32 *23), "pink",player)
+normalDoor2 = Door((49 * 32),(32*21), None,player)
+normalDoor3 = Door((38 * 32),(27*32), None,player)
 doors.append(redDoor)
 doors.append(blueDoor)
 doors.append(normalDoor)
@@ -67,6 +69,8 @@ doors.append(greenDoor)
 doors.append(yellowDoor)
 doors.append(exitDoor)
 doors.append(pinkDoor)
+doors.append(normalDoor2)
+doors.append(normalDoor3)
 
 runtimeTxt = Text(Point(400, 25), "")
 fpsTxt = Text(Point(400, 50), "")
@@ -216,9 +220,13 @@ def game():
     monster.draw(gw)
     player.draw(gw)
 
-    redDoor.setTiles([grid[1][10],grid[1][9],grid[2][10],grid[2][9]])
-    blueDoor.setTiles([grid[21][25],grid[21][26],grid[22][26],grid[22][25]])
+    redDoor.setTiles([grid[9][19],grid[8][19],grid[9][20],grid[8][20]])
+    blueDoor.setTiles([grid[35][29],grid[35][28],grid[36][29],grid[36][28]])
+    yellowDoor.setTiles([grid[21][25],grid[21][26],grid[20][26],grid[20][25]])
     greenDoor.setTiles([grid[10][36],grid[10][35],grid[11][35],grid[11][36]])
+    pinkDoor.setTiles([grid[22][1],grid[23][1],grid[22][2],grid[23][2]])
+
+    exitDoor.setTiles([grid[0][8],grid[0][9]])
 
     print(len(grid))
     global selectedSprite
@@ -581,6 +589,7 @@ def moveCamera(xPos,yPos):
 
 def toggleDebugView(activate:bool):
     global debugView
+    global grid
     if (debugView == activate):
         return
     debugView = activate
@@ -603,6 +612,10 @@ def toggleDebugView(activate:bool):
         exitZoneDebug.draw(gw)
         for i in viewShifters:
             i.draw()
+
+    for row in grid:
+        for tile in row:
+            tile.toggleEditMode()
 def toggleWorldEdit(activate:bool):
     global editView
     global selectedSprite
