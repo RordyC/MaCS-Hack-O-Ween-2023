@@ -40,7 +40,7 @@ class InputHandler(object):
         evnt = evnt.lower()
         if (evnt != self.__currentKey):
             self.__currentKey = evnt
-            print("pressed: " + self.__currentKey)
+            #print("pressed: " + self.__currentKey)
             self.keyPressedFunc(evnt)
             if (evnt == "w"):
                 self.__wKey = True
@@ -69,7 +69,7 @@ class InputHandler(object):
     def keyReleased(self, evnt):
         evnt = evnt.lower()
         if (evnt == self.__currentKey):
-            print("released: " + evnt)
+            #print("released: " + evnt)
             self.__currentKey = ""
 
         if (evnt == "w"):

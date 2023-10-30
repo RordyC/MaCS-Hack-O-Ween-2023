@@ -227,7 +227,7 @@ def game():
 
     exitDoor.setTiles([grid[0][8],grid[0][9]])
 
-    print(len(grid))
+    #print(len(grid))
     global selectedSprite
     game_over = False
     while not game_over:  # This will run until 'game_over' is False.
@@ -358,7 +358,7 @@ def makeGrid():
 
     global endTile
     endTile = grid[1][1]
-    print(f'Grid Size: {count}')
+    print(f'Collision Grid Size: {count}')
 
 def gridEditing():
     col = int(mouseToWorld()[0] // gridCellSize)
@@ -566,6 +566,7 @@ def saveWorld():
         pickle.dump(gridData, f)
     with open('save_data/sprite_data','wb') as f:
         pickle.dump(spriteData,f)
+        print("Saved.")
 def loadWorld():
     print("Loading World Sprites...")
     global sprites

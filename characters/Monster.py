@@ -29,7 +29,6 @@ class Monster():
         self.__angry = False
         self.__width = self.__img.getWidth()
         self.__dir = [0,0]
-        print(self.__width)
 
     def draw(self, gw: GraphWin):
         self.__gw = gw
@@ -114,7 +113,7 @@ class Monster():
 
                 self.__currentPathTargetPos[0] = (target[1] * 32) + 16
                 self.__currentPathTargetPos[1] = (target[0] * 32) + 16
-                print(target[0] * 32,target[1])
+                #print(target[0] * 32,target[1])
 
         self.m = sqrt(abs((self.dx * self.dx) + abs(self.dy * self.dy)))
 
