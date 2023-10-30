@@ -1,6 +1,6 @@
-from graphics import Image
-from graphics import Point
-from Collisions import *
+from game_systems.graphics import Image
+from game_systems.graphics import Point
+from game_systems.Collisions import *
 from characters.Player import Player
 class Key:
     def __init__(self, x,y, type,player):

@@ -1,6 +1,7 @@
-import graphics
-from graphics import *
-from tilebase import *
+import game_systems.graphics
+from game_systems import graphics
+from game_systems.graphics import *
+from game_systems.tilebase import *
 
 
 

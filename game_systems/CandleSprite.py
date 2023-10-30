@@ -1,5 +1,5 @@
 import random
-from graphics import *
+from game_systems.graphics import *
 class Candle():
     def __init__(self,x,y,lit:bool,gw):
         self.x = x

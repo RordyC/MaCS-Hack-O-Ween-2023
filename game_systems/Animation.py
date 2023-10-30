@@ -1,7 +1,4 @@
 from graphics import *
-from InputHandler import *
-from Collisions import circleRectMove
-
 
 class Animation:
     def __init__(self, images, delay, player):

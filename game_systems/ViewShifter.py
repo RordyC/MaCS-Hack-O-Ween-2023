@@ -1,6 +1,6 @@
 
-from graphics import *
-from Collisions import circleRect
+from game_systems.graphics import *
+from game_systems.Collisions import circleRect
 class ViewShifter():
     def __init__(self,x,y,player,graphWin,firstOffset,secondOffset, isVertical:bool):
         self.x = x

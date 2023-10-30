@@ -1,6 +1,6 @@
-from graphics import *
-from InputHandler import *
-from Collisions import circleRectMove
+from game_systems.graphics import *
+from game_systems.InputHandler import *
+from game_systems.Collisions import circleRectMove
 
 class Player():
     def __init__(self, playerStart:Point,inputHandler:InputHandler):

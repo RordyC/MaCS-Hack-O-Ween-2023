@@ -3,20 +3,19 @@
 #Add your names here!!
 import random
 
-import graphics
 from characters.Monster import *
 from characters.Player import Player
 from game_systems.ViewShifter import ViewShifter
-from Door import Door
-from InputHandler import *
-from graphics import *
+from game_systems.Door import Door
+from game_systems.InputHandler import *
+from game_systems.graphics import *
 from time import *
-from tilebase import *
+from game_systems.tilebase import *
 from queue import PriorityQueue
-from Collisions import *
+from game_systems.Collisions import *
 from game_systems.WorldSprite import WorldSprite
 import pickle
-from Key import Key
+from game_systems.Key import Key
 from game_systems.CandleSprite import Candle
 #from Doors import Door
 
@@ -272,12 +271,10 @@ def game():
 
 
         if (inputHandler.getMousePressed() and editView and selectedSprite == None):
-            print("!")
             closestSprite = None
             closestDist = math.inf
 
             for sprite in sprites:
-                print("b")
                 currentDist = (((mouseToWorld()[0] - sprite.getGrabPointPos().x)*(mouseToWorld()[0] - sprite.getGrabPointPos().x)) \
                               + (mouseToWorld()[1] - sprite.getGrabPointPos().y)*(mouseToWorld()[1] - sprite.getGrabPointPos().y))
                 if ((abs(currentDist) < closestDist)and currentDist < 256):

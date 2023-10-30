@@ -1,7 +1,7 @@
-from graphics import *
-from Collisions import pointCircle
+from game_systems.graphics import *
+from game_systems.Collisions import pointCircle
 from characters.Player import Player
-from Key import Key
+from game_systems.Key import Key
 
 class Door():
     def __init__(self,x,y,keycard:str,player):

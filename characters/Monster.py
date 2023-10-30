@@ -1,6 +1,6 @@
 import math
 
-from graphics import *
+from game_systems.graphics import *
 from math import sqrt
 from time import *
 class Monster():
@@ -162,14 +162,10 @@ class Monster():
         return self.playerDistance
     def updatePath(self, path):
         self.__path = path
-
         for i, p in enumerate(self.__path):
             if (p == self.__currentTarget):
-                print("N")
                 for x in range(0,i):
                     self.__path.pop(0)
-
-
 
         target = self.__path.pop(0)
         self.__currentTarget == target

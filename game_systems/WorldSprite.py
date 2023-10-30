@@ -1,5 +1,5 @@
-import graphics
-from graphics import *
+import game_systems.graphics
+from game_systems.graphics import *
 
 paths = [
     ["sprites/walls/wall_front","sprites/walls/wall_front_right","sprites/walls/wall_front_left"],
@@ -12,7 +12,7 @@ paths = [
         ]
 
 class WorldSprite():
-    def __init__(self,x,y,typeID:int,typeVariationID:int,layer:int,win:graphics.GraphWin):
+    def __init__(self,x,y,typeID:int,typeVariationID:int,layer:int,win:game_systems.graphics.GraphWin):
         self.x = x
         self.y = y
         self.__typeInd = typeID
