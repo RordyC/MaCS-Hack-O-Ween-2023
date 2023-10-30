@@ -117,8 +117,8 @@ def menu():
     white_background.draw(gw)
 
     # Title 
-    titleLabel = Text(Point(480, 100), 'GHOUL ESCAPE')
-    titleLabel.setSize(28)
+    titleLabel = Text(Point(480, 150), 'GHOUL ESCAPE')
+    titleLabel.setSize(32)
     titleLabel.setTextColor('orange')
     titleLabel.setStyle('bold italic')
 
@@ -150,6 +150,18 @@ def menu():
     quitButton.draw(gw)
     quitLabel.draw(gw)
     while True:
+            mousePos = inputHandler.getMousePos()
+
+            if (353 < mousePos[0] < 607 and 300 < mousePos[1] < 350):
+                startButton.setOutline("white")
+            else:
+                startButton.setOutline("orange")
+
+            if (353 < mousePos[0] < 607 and 400 < mousePos[1] <  450):
+                quitButton.setOutline("white")
+            else:
+                quitButton.setOutline("red")
+
             click_point = gw.checkMouse()
             if click_point:
                 if 353 < click_point.getX() < 607:
@@ -160,8 +172,7 @@ def menu():
     # Undraws menu and pauses for (1) second 
     for item in gw.items[:]:
         item.undraw()
-    gw.update()                    
-    #sleep(1)
+    gw.update()
 def drawWorld():
     pass
 def game():
