@@ -4,7 +4,9 @@ from graphics import *
 from math import sqrt
 from time import *
 class Monster():
-    def __init__(self):
+    def __init__(self,startX,startY):
+        self.__startX = startX
+        self.__startY = startY
         self.__movementSpeed = 90
         self.__hasLineOfSight = True
         self.__currentTargetX = 0
@@ -18,17 +20,20 @@ class Monster():
         self.__currentTarget = [0,0]
         self.__currentPathTargetPos = [100, 100]
 
-        self.__img = Image(Point(25, 25), "sprites/ghost/ghost1.png")
+        self.__img = Image(Point(self.__startX, self.__startY), "sprites/ghost/ghost1.png")
+        self.__imgs = [Image(Point(self.__startX, self.__startY),"sprites/ghost/ghost1.png"),Image(Point(self.__startX, self.__startY),"sprites/ghost/ghost2.png"),Image(Point(self.__startX, self.__startY),"sprites/ghost/ghost3.png")]
+        self.__currentFrame = 0
+        self.__animSpeed = 0.2
+        self.__currentFrameTime = 0.0
         self.__gw = None
         self.__angry = False
-        self.__altImg = Image(Point(25, 25), "sprites/angry_head.png")
         self.__width = self.__img.getWidth()
         self.__dir = [0,0]
         print(self.__width)
 
     def draw(self, gw: GraphWin):
         self.__gw = gw
-        self.__img.draw(gw)
+        self.__imgs[0].draw(gw)
 
     def hit(self,isHit):
 
@@ -49,6 +54,7 @@ class Monster():
            # self.__img.draw(self.__gw)
 
     def game_over_screen(self):
+        self.resetPos()
         return
         '''
         # unfinished death message
@@ -120,15 +126,30 @@ class Monster():
 
         if (self.m > 10):
             self.__img.move(self.dx * self.__movementSpeed * deltaT, self.dy * self.__movementSpeed * deltaT)
-            self.__altImg.move(self.dx * self.__movementSpeed * deltaT, self.dy * self.__movementSpeed * deltaT)
+            for i in self.__imgs:
+                i.move(self.dx * self.__movementSpeed * deltaT, self.dy * self.__movementSpeed * deltaT)
+
+        self.__currentFrameTime = self.__currentFrameTime + deltaT
+        if (self.__currentFrameTime > self.__animSpeed):
+            self.__currentFrameTime = 0
+            self.__imgs[self.__currentFrame].undraw()
+            self.__currentFrame = (self.__currentFrame + 1) % 3
+            self.__imgs[self.__currentFrame].draw(self.__gw)
     def getPos(self):
         return self.__img.getAnchor()
-
+    def resetPos(self):
+        dx = self.__startX - self.__img.getAnchor().x
+        dy = self.__startY - self.__img.getAnchor().y
+        self.__img.move(dx, dy)
+        for i in self.__imgs:
+            i.move(dx, dy)
     def calculatePlayerDir(self):
         dx = (self.__currentTargetX - self.__img.getAnchor().x)
         dy = (self.__currentTargetY - self.__img.getAnchor().y)
 
         m = sqrt(abs((dx*dx) + abs(dy*dy)))
+        if (m == 0):
+            return
         self.playerDistance = m
         dx = dx / m
         dy = dy / m

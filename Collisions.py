@@ -46,7 +46,7 @@ def circleRectMove(cx, potentialPosition,tileX,tileY):
 
     rayMag = sqrt((rayToNearest[0]*rayToNearest[0])+(rayToNearest[1]*rayToNearest[1]))
     overlap = cx - rayMag
-    if (overlap > 0):
+    if (overlap > 0 and rayMag > 0):
 
         potentialPosition[0] = potentialPosition[0] - (rayToNearest[0]/rayMag) * overlap
         potentialPosition[1] = potentialPosition[1] - (rayToNearest[1]/rayMag) * overlap

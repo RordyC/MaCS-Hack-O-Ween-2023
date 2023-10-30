@@ -3,12 +3,12 @@ from graphics import *
 
 paths = [
     ["sprites/walls/wall_front","sprites/walls/wall_front_right","sprites/walls/wall_front_left"],
-    ["sprites/floors/floor_top","sprites/floors/floor_top_door","sprites/floors/floor_right","sprites/floors/floor_left","sprites/floors/floor_left_top_corner","sprites/floors/floor_right_top_corner","sprites/floors/floor_left_bottom_corner"],
+    ["sprites/floors/floor_top","sprites/floors/floor_top_door","sprites/floors/floor_right","sprites/floors/floor_left","sprites/floors/floor_left_top_corner","sprites/floors/floor_right_top_corner","sprites/floors/floor_left_bottom_corner","sprites/floors/floor_right_bottom_corner"],
     ["sprites/floors/floor_base","sprites/floors/floor_vent_left","sprites/floors/floor_vent_right"],
     ["sprites/walls/wall_back","sprites/walls/wall_back_right","sprites/walls/wall_back_left","sprites/walls/wall_left","sprites/walls/wall_right"],
-    ["sprites/blood/blood_top1","sprites/blood/blood_top2"],
-    ["sprites/key_wall/key_wall_blue", "sprites/key_wall/key_wall_red", "sprites/key_wall/key_wall_yellow","sprites/key_wall/key_wall_green",
-     "sprites/walls/wall_left", "sprites/walls/wall_right"]
+    ["sprites/blood/blood_top1","sprites/blood/blood_top2","sprites/blood/blood_top3"],
+    ["sprites/key_wall/key_wall_blue", "sprites/key_wall/key_wall_red", "sprites/key_wall/key_wall_yellow","sprites/key_wall/key_wall_green","sprites/key_wall/key_wall_pink",
+     "sprites/key_wall/terminal_red", "sprites/walls/wall_right"]
         ]
 
 class WorldSprite():
