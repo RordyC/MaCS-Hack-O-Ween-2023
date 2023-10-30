@@ -2,7 +2,7 @@
 from graphics import *
 from Collisions import circleRect
 class ViewShifter():
-    def __init__(self,x,y,player,graphWin,firstOffset,secondOffset):
+    def __init__(self,x,y,player,graphWin,firstOffset,secondOffset, isVertical:bool):
         self.x = x
         self.y = y
         self.__firstOffset = firstOffset
@@ -12,6 +12,7 @@ class ViewShifter():
         self.__debugRect = Rectangle(Point(self.x-32,self.y-32),Point(self.x +32,self.y + 32))
         self.__debugRect.setOutline("ORANGE")
         self.__isPlayerInside = False
+        self.__isVertical = isVertical
 
     def draw(self):
         self.__debugRect.draw(self.__win)
@@ -28,9 +29,14 @@ class ViewShifter():
         elif (self.__isPlayerInside == True):
             self.__isPlayerInside = False
             self.__debugRect.setOutline("orange")
-            self.setWinCoords(self.isPlayerUp())
+            if (self.__isVertical):
+                self.setWinCoords(self.isPlayerUp())
+            else:
+                self.setWinCoords(self.isPlayerRight())
     def isPlayerUp(self) -> bool:
         return (self.__player.getPos().y < self.y + 16)
+    def isPlayerRight(self) -> bool:
+        return (self.__player.getPos().x < self.x + 16)
 
     def setWinCoords(self, isUp:bool):
         if (isUp):

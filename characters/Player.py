@@ -10,10 +10,10 @@ class Player():
         self.__circle.setFill("orange")
         self.__circle.setOutline("brown")
 
-        self.__speed = 125.0   #How fast the player can run around.
+        self.__speed = 500  #How fast the player can run around.
         self.__vx = 0.0 #Player velocity on the X axis.
         self.__vy = 0.0 #Player velocity on the Y axis.
-        self.keys = {'red': False, 'green':False, 'blue':False, 'yellow':False}
+        self.keys = {'red': False, 'green':False, 'blue':False, 'yellow':False,'pink':False}
         self.collected_keys = []
         self.__ct = [] #The tiles that the player will check for collision with.
 

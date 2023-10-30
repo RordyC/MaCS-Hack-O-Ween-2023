@@ -55,3 +55,5 @@ class Door():
 
     def setTiles(self, tiles):
         self.__tiles = tiles
+        for tile in self.__tiles:
+            tile.updateState(1)

@@ -49,14 +49,24 @@ mousePosTxt = Text(Point(100, 75), f"Mouse Pos: {0},{0}")
 gridIndexTxt = Text(Point(100, 50), f"Grid Index: {0},{0}")
 gridIndexTxt.setTextColor("orange")
 mousePosTxt.setTextColor("cyan")
+exitZoneDebug = Rectangle(Point((32 * 8),(32*-2)),Point((32 * 10),(32*0)))
+exitZoneDebug.setOutline("pink")
 
 doors = []
-normalDoor = Door((64 * 8),64, None,player)
-redDoor = Door((64 * 5),64, "red",player)
-blueDoor = Door((64 * 13),64 *11, "blue",player)
+exitDoor = Door((32 * 9),(32*0), None,player)
+normalDoor = Door((32 * 46),(32*34), None,player)
+redDoor = Door((32 * 20),(32*9), "red",player)
+blueDoor = Door((32 * 29),(32 *36), "blue",player)
+greenDoor = Door((32 * 36),(32*11), "green",player)
+yellowDoor = Door((64 * 13),(32 *21), "yellow",player)
+pinkDoor = Door((32 * 2),(32 *23), "pink",player)
 doors.append(redDoor)
 doors.append(blueDoor)
 doors.append(normalDoor)
+doors.append(greenDoor)
+doors.append(yellowDoor)
+doors.append(exitDoor)
+doors.append(pinkDoor)
 
 runtimeTxt = Text(Point(400, 25), "")
 fpsTxt = Text(Point(400, 50), "")
@@ -75,7 +85,16 @@ nearTiles = []
 sprites = []
 selectedSprite = None
 lastTileType = (0,0)
-viewShifters = [ViewShifter((64 * 5),64,player,gw,(0,0),(0,-200))]
+viewShifters = [
+                ViewShifter((32 * 43),27*32,player,gw,(1084,700),(1084,370),True),
+                ViewShifter((32 * 49),21*32,player,gw,(1084,370),(1084,0),True),
+                ViewShifter((32 * 62),21*32,player,gw,(1084,370),(1084,0),True),
+                ViewShifter((32 * 36),(32*11),player,gw,(1084,0),(350,0),True),
+                ViewShifter((32 * 26),(32*21),player,gw,(350,640),(350,0),True),
+                ViewShifter((32 * 20),(32*9),player,gw,(350,0),(0,-300),True),
+                ViewShifter((32 * 2),(32*23),player,gw,(0,700),(0,0),True),
+                ViewShifter((32 * 19),(32*40),player,gw,(350,640),(0,700),False) #This is the weird sideways one. <--------
+                ]
 
 candles = [Candle(1975,1226,True,gw),
            Candle(1923,1190,False,gw),
@@ -159,14 +178,16 @@ def game():
 
     keys = []
 
-    key_blue = Key(505, 636, 'blue',player)
+    key_blue = Key(1920, 990, 'blue',player)
     keys.append(key_blue)
-    key_red = Key(435, 435, 'red',player)
+    key_red = Key(265, 425, 'red',player)
     keys.append(key_red)
-    key_yellow = Key(550, 636, 'yellow',player)
+    key_yellow = Key(830, 225, 'yellow',player)
     keys.append(key_yellow)
-    key_green = Key(400, 435, 'green',player)
+    key_green = Key(1535, 285, 'green',player)
     keys.append(key_green)
+    key_pink = Key(1060, 965, 'pink',player)
+    keys.append(key_pink)
     for key in keys:
         key.draw(gw)  
 
@@ -197,6 +218,8 @@ def game():
 
     redDoor.setTiles([grid[1][10],grid[1][9],grid[2][10],grid[2][9]])
     blueDoor.setTiles([grid[21][25],grid[21][26],grid[22][26],grid[22][25]])
+    greenDoor.setTiles([grid[10][36],grid[10][35],grid[11][35],grid[11][36]])
+
     print(len(grid))
     global selectedSprite
     game_over = False
@@ -277,7 +300,6 @@ def game():
             offsetX = 1084
             offsetY = 700
             moveCamera(offsetX,offsetY)
-            game_over = True
         monster.hit(is_hit)
 
         global monsterCollision
@@ -305,6 +327,9 @@ def game():
             if (cameraVX != 0 or cameraVY != 0):
                 moveCamera(x,y)
 
+        win_zone = circleRect(player.getPos().x, player.getPos().y, 16, (32*8), (32*-2),64,64)
+        if (win_zone):
+            game_over = True
         if (gw.closed): #When the window is closed the gameloop finishes
             game_over = True
             
@@ -567,6 +592,7 @@ def toggleDebugView(activate:bool):
         runtimeTxt.undraw()
         fpsTxt.undraw()
         gridIndexTxt.undraw()
+        exitZoneDebug.undraw()
         for i in viewShifters:
             i.undraw()
     else:
@@ -574,6 +600,7 @@ def toggleDebugView(activate:bool):
         runtimeTxt.draw(gw)
         fpsTxt.draw(gw)
         gridIndexTxt.draw(gw)
+        exitZoneDebug.draw(gw)
         for i in viewShifters:
             i.draw()
 def toggleWorldEdit(activate:bool):
