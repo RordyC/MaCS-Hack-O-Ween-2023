@@ -6,6 +6,7 @@ Escape a haunted laboratory where an evil resurrected spirit is chasing you down
 This project was created in Python using only the grapics.py library created by John Zelle. To fit the halloween vibes we accordingly spilled ketchup all over the map to make it more spooky.
  # Instructions:
 
+Download the code as a zip folder and unzip it. Open up the main.py file to run it.<br />
 'WASD' to move.<br />
 Collect keycards to gain access to certain rooms.
 
